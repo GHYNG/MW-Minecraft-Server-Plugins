@@ -1,0 +1,5 @@
+name: MW_Block_Protection
+version: TEMP-1.1-1.16.5(Paper)
+description: This plugin protects blocks from different entities, including players, from illegle ways to break them.
+author: GHYNG
+main: org.mwage.mcPlugin.block_protection.Main
