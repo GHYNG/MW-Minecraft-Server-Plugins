@@ -1,0 +1,6 @@
+name: MW_Chat
+version: TEMP-2.2-1.16.5(Paper)
+description: This plugin manages players' chat. Colored title and sound. This plugin is temp. Future updates needed.
+author: GHYNG
+main: org.mwage.mcPlugin.chat.Main
+softdepend: [MW_Color_Code]
