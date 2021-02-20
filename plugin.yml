@@ -3,4 +3,6 @@ version: Paper-1.16.5-MW-1
 description: This plugin manages players' chat. Colored title and sound. This plugin is temp. Future updates needed.
 author: GHYNG
 main: org.mwage.mcPlugin.chat.Main
+depend: [MW_Plugin_Main]
 softdepend: [MW_Color_Code]
+api-version: 1.16
