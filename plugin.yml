@@ -1,7 +1,7 @@
 name: MW_World_Management
-version: TEMP-1-1.16.5(Paper)
+version: Paper-1.16.5-MW-1
 description: This plugin manages different worlds.
 author: GHYNG
 main: org.mwage.mcPlugin.world_management.Main
-softdepend: [MW_Plugin_Main]
+depend: [MW_Plugin_Main]
 api-version: 1.16
