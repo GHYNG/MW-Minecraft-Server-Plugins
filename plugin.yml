@@ -1,5 +1,7 @@
 name: MW_Color_Code
-version: Paper-1.16.5-MW-2
+version: Paper-1.16.5-MW-1
 description: This plugin manages color codes in different texts in game.
 author: GHYNG
 main: org.mwage.mcPlugin.color_code.Main
+depend: [MW_Plugin_Main]
+api-version: 1.16
