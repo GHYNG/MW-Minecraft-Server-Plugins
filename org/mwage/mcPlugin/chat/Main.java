@@ -121,7 +121,7 @@ class ChatListener implements Listener, ChatUtils {
 					onlinePlayer.sendTitle(title, "提到你的是" + ChatColor.AQUA + "服务器娘");
 				}
 				else {
-					playerChatSound(onlinePlayer);
+					// playerChatSound(onlinePlayer);
 				}
 			}
 		}
