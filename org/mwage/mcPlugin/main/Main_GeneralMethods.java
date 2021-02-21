@@ -1,8 +1,6 @@
 package org.mwage.mcPlugin.main;
-
 import org.bukkit.Bukkit;
 import org.bukkit.event.server.ServerCommandEvent;
-
 /*
  * This interface contains methods relate to server generally,
  * like broadcast messages.
@@ -72,9 +70,15 @@ public interface Main_GeneralMethods {
 	default boolean nor(boolean... bs) {
 		return not(or(bs));
 	}
+	/*
+	 * Make the server say things.
+	 */
 	default void serverSay(String message) {
 		String command = "say " + message;
 		ServerCommandEvent event = new ServerCommandEvent(Bukkit.getConsoleSender(), command);
 		Bukkit.getServer().getPluginManager().callEvent(event);
+		if(!event.isCancelled()) {
+			Bukkit.broadcastMessage(message);
+		}
 	}
 }
