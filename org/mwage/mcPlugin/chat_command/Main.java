@@ -1,6 +1,8 @@
 package org.mwage.mcPlugin.chat_command;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -16,7 +18,11 @@ import org.mwage.mcPlugin.main.Main_GeneralMethods;
 public class Main extends JavaPlugin {
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(new MainListener(), this);
+		readyAllOnlinePlayers();
 	}
+	/*
+	 * Ready all players who are currently online.
+	 */
 	public void readyAllOnlinePlayers() {
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
 		for(Player onlinePlayer : onlinePlayers) {
@@ -25,6 +31,9 @@ public class Main extends JavaPlugin {
 	}
 }
 class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods {
+	/*
+	 * Ready the player when they join.
+	 */
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
@@ -46,10 +55,10 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 			return;
 		}
 		else {
-			parseEvent(mwcevent);
+			parseCommand(mwcevent);
 		}
 	}
-	public void parseEvent(MWCEvent event) {
+	public void parseCommand(MWCEvent event) {
 		Player player = event.getPlayer();
 		if(!isOwner(player)) {
 			mwcNotAllowed(player);
@@ -98,8 +107,7 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 						sechoOwner(player, "您关闭了autoyo，果然打招呼这种事还是亲自做比较好呢~");
 					}
 					else {
-						mwcBad(player);
-						sechoOwner(player, "您输错指令啦！ 好菜！");
+						unknownCommand(player);
 					}
 				}
 				else {
@@ -111,9 +119,108 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 					echo(player, page);
 				}
 			}
+			else if(c0.equalsIgnoreCase("location")) {
+				if(size > 1) {
+					String c1 = commands.get(1);
+					if(c1.equalsIgnoreCase("add")) {
+						if(size > 2) {
+							String c2 = commands.get(2);
+							if(!goodIdentifier(c2)) {
+								sechoOwner(player, "在不是合法的标识符哟~");
+								return;
+							}
+							Set<String> identifiers = setting.locations.keySet();
+							for(String identifier : identifiers) {
+								if(c2.equals(identifier)) {
+									sechoOwner(player, "这个标识符已经有了啦！");
+									return;
+								}
+							}
+							setting.locations.put(c2, player.getLocation());
+							mwcGood(player);
+							sechoOwner(player, line("将当前位置设为", c1));
+						}
+						else {
+							List<Object> page = new ArrayList<Object>();
+							page.add("mwc location add 指令说明");
+							page.add("  <identifier> - 新增位置的标识符");
+							echo(player, pageList(page));
+						}
+					}
+					else if(c1.equalsIgnoreCase("remove")) {
+						if(size > 2) {
+							String c2 = commands.get(2);
+							if(!setting.locations.containsKey(c2)) {
+								sechoOwner(player, line(c2, "不是已储存的位置。"));
+							}
+							else {
+								setting.locations.remove(c2);
+								mwcGood(player);
+								sechoOwner(player, line(c2, "已经删除。"));
+							}
+						}
+						else {
+							String line0 = "mwc location remove 指令说明";
+							String line1 = "  <identifier> - 删除的标识符";
+							echo(player, page(line0, line1));
+						}
+					}
+					else if(c1.equalsIgnoreCase("list")) {
+						Set<String> keys = setting.locations.keySet();
+						int numKeys = keys.size();
+						if(numKeys == 0) {
+							sechoOwner(player, "没有找到任何您储存的位置呢！");
+						}
+						else {
+							String strKeys = "";
+							for(String key : keys) {
+								strKeys += key + "，";
+							}
+							sechoOwner(player, line("您储存了：", strKeys, "这些位置！"));
+						}
+					}
+					else if(c1.equalsIgnoreCase("goto")) {
+						if(size > 2) {
+							String c2 = commands.get(2);
+							if(setting.locations.containsKey(c2)) {
+								Location location = setting.locations.get(c2);
+								if(location == null) {
+									mwcBad(player);
+									sechoOwner(player, "出错了！指定地点竟然是null！");
+								}
+								else {
+									player.teleport(location);
+									mwcGood(player);
+									sechoOwner(player, "传送已经准备完毕，一路顺风！");
+								}
+							}
+							else {
+								mwcBad(player);
+								sechoOwner(player, "没有找到指定的位置呢！");
+							}
+						}
+						else {
+							String line0 = "mwc location goto 指令说明";
+							String line1 = "  <identifier> - 您想要传送去的地点";
+							echo(player, page(line0, line1));
+						}
+					}
+					else {
+						unknownCommand(player);
+					}
+				}
+				else {
+					List<Object> page = new ArrayList<Object>();
+					page.add("mwc location 指令说明");
+					page.add("  add <identifier> - 储存当前的位置，并用标识符标记");
+					page.add("  remove <identifier> - 删除指定的位置");
+					page.add("  list - 显示储存的所有位置");
+					page.add("  goto <identifier> - 前往指定的位置");
+					echo(player, pageList(page));
+				}
+			}
 			else {
-				mwcBad(player);
-				sechoOwner(player, "您输错指令啦！ 好菜！");
+				unknownCommand(player);
 			}
 		}
 		else {
@@ -121,7 +228,8 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 			String line1 = "  opme - 将自己设为op";
 			String line2 = "  deop - 将自己解除op";
 			String line3 = "  autoyo <boolean> - 玩家加入的时候您将会自动发出“yooo！”";
-			String page = page(line0, line1, line2, line3);
+			String line4 = "  location <command> - 关于一些坐标的操作";
+			String page = page(line0, line1, line2, line3, line4);
 			echo(player, page);
 		}
 	}
@@ -145,5 +253,9 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 	public void mwcNotAllowed(Player player) {
 		Location location = player.getLocation();
 		player.playSound(location, Sound.ENTITY_VILLAGER_NO, SoundCategory.PLAYERS, 0.8f, 1.2f);
+	}
+	public void unknownCommand(Player player) {
+		mwcBad(player);
+		sechoOwner(player, "您输错指令啦！好菜！");
 	}
 }
