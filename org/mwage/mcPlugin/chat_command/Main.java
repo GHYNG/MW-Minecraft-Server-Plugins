@@ -16,9 +16,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mwage.mcPlugin.main.Main_GeneralMethods;
 @SuppressWarnings("deprecation")
 public class Main extends JavaPlugin {
-	public void onEnable() {
+	public void onEnable() {readyAllOnlinePlayers();
 		Bukkit.getPluginManager().registerEvents(new MainListener(), this);
-		readyAllOnlinePlayers();
+		Bukkit.getPluginManager().registerEvents(new AutoyoListener(), this);
+		
 	}
 	/*
 	 * Ready all players who are currently online.
