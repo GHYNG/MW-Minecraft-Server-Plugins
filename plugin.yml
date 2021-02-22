@@ -1,5 +1,5 @@
 name: MW_Chat_Command
-version: Paper-1.16.5-MW-1
+version: Paper-1.16.5-MW-1.1
 description: This plugin gives owners of the server some powerful commands without op permission. 
 author: GHYNG
 main: org.mwage.mcPlugin.chat_command.Main
