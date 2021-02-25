@@ -1,5 +1,5 @@
 # MW-Chat-Command
-MWC命令插件
+MWC命令插件。
 
 # 命令集
 
