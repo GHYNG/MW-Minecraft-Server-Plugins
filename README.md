@@ -5,6 +5,7 @@ MWC命令插件
 
 （注：当末尾为X代表命令不完整；末尾为V代表完整，将会调用功能）
 
+"""text
 mwc - 总命令开头 X
 
   autoyo - 玩家加入时自动欢迎 X
@@ -20,3 +21,4 @@ mwc - 总命令开头 X
   location - 对坐标的操作 X
   
     add <identifier>
+"""
