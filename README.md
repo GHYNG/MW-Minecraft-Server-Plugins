@@ -7,14 +7,16 @@ MWC命令插件
 
     注意：
     <identifier> - 标识符，必须符合Java命名规则（但不必规避Java关键字或保留字）
+    <boolean> - 布尔值。true/false
+    <command> - 有分支命令
 
     mwc - 总命令开头 X
-      autoyo - 玩家加入时自动欢迎 X
+      autoyo <boolean> - 玩家加入时自动欢迎 X
         true - 开启 V
         false - 关闭 V
       opme - 将自己设为OP V
       deop - 取消自己的OP V
-      location - 对坐标的操作 X
+      location <command> - 对坐标的操作 X
         add <identifier> - 将当前坐标标记为<identifier> V
         remove <identifier> - 删除<identifier>标记的坐标 V
         list - 显示所有的坐标 V
