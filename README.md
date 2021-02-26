@@ -2,7 +2,7 @@
 用于奶路服务器的插件。
 
 # 如何下载：
-在 https://github.com/GHYNG/MW-Minecraft-Server-Plugins/releases 页面中下载各个标题下的Jar文件，并将这些文件放入服务器目录下面的plugins文件夹中即可。如果服务器已经在运行，需要reload服务器。建议下载标题中带有“Nesest”字样的最新版本插件。
+在 https://github.com/GHYNG/MW-Minecraft-Server-Plugins/releases 页面中下载各个标题下的Jar文件，并将这些文件放入服务器目录下面的plugins文件夹中即可。如果服务器已经在运行，需要reload服务器。建议下载标题中带有“Newest”字样的最新版本插件。
 
 # 已有插件介绍
 
