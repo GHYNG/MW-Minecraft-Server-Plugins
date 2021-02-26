@@ -1,5 +1,4 @@
 package org.mwage.mcPlugin.main;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -8,11 +7,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-public class Main extends JavaPlugin implements Main_GeneralMethods {
+import org.mwage.mcPlugin.main.util.plugin.MWPlugin;
+public class Main extends MWPlugin implements Main_GeneralMethods {
 	@Override
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(new MainListener(), this);
+		registerListener(new MainListener());
 	}
 }
 class MainListener implements Listener, Main_GeneralMethods {
