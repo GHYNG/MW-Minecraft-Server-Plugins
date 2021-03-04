@@ -2,6 +2,7 @@ package org.mwage.mcPlugin.chat;
 import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.Sound;
@@ -50,12 +51,24 @@ class ChatListener implements Listener, ChatUtils {
 		else {
 			fullName = ChatColor.DARK_GREEN + "[C] " + name;
 		}
+		if(player.getGameMode() == GameMode.SPECTATOR && (!player.isOp())) {
+			fullName = "[观察] " + fullName;
+		}
 		String message = event.getMessage();
 		String completeMessage = fullName + ChatColor.WHITE + ": " + message;
+		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
+		if(player.getGameMode() == GameMode.SPECTATOR && (!player.isOp())) {
+			for(Player onlinePlayer : onlinePlayers) {
+				if(onlinePlayer.getGameMode() == GameMode.SPECTATOR || onlinePlayer.isOp()) {
+					onlinePlayer.sendMessage(completeMessage);
+				}
+			}
+			event.setCancelled(true);
+			return;
+		}
 		Bukkit.getServer().broadcastMessage(completeMessage);
 		event.setCancelled(true);
 		playerChatSound(player);
-		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
 		for(Player onlinePlayer : onlinePlayers) {
 			String onlineName = onlinePlayer.getName();
 			if(message.toLowerCase().contains("@" + onlineName.toLowerCase())) {
@@ -70,7 +83,7 @@ class ChatListener implements Listener, ChatUtils {
 			}
 			else if(message.toLowerCase().contains("@owner") && isOwner(onlinePlayer)) {
 				playerReferencedSound(onlinePlayer);
-				String title = ChatColor.DARK_PURPLE + "你被在聊天信息中作为服主被提到了";
+				String title = ChatColor.DARK_PURPLE + "服主被提到了";
 				if(name.equals(onlineName)) {
 					onlinePlayer.sendTitle(title, "提到你的是你自己");
 				}
@@ -80,7 +93,7 @@ class ChatListener implements Listener, ChatUtils {
 			}
 			else if((message.toLowerCase().contains("@manager") || message.toLowerCase().contains("@operator")) && player.isOp()) {
 				playerReferencedSound(onlinePlayer);
-				String title = ChatColor.DARK_PURPLE + "你被在聊天信息中作为管理员被提到了";
+				String title = ChatColor.DARK_PURPLE + "管理员被提到了";
 				if(name.equals(onlineName)) {
 					onlinePlayer.sendTitle(title, "提到你的是你自己");
 				}
@@ -90,7 +103,7 @@ class ChatListener implements Listener, ChatUtils {
 			}
 			else if(message.toLowerCase().contains("@all")) {
 				playerReferencedSound(onlinePlayer);
-				String title = ChatColor.DARK_PURPLE + "所有人都被在聊天信息中提到了";
+				String title = ChatColor.DARK_PURPLE + "所有人都被提到了";
 				if(name.equals(onlineName)) {
 					onlinePlayer.sendTitle(title, "提到你的是你自己");
 				}
