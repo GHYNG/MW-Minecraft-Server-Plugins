@@ -91,7 +91,7 @@ class ChatListener implements Listener, ChatUtils {
 					onlinePlayer.sendTitle(title, "提到你的是" + fullName);
 				}
 			}
-			else if((message.toLowerCase().contains("@manager") || message.toLowerCase().contains("@operator")) && player.isOp()) {
+			else if((message.toLowerCase().contains("@manager") || message.toLowerCase().contains("@operator")) && onlinePlayer.isOp()) {
 				playerReferencedSound(onlinePlayer);
 				String title = ChatColor.DARK_PURPLE + "管理员被提到了";
 				if(name.equals(onlineName)) {
