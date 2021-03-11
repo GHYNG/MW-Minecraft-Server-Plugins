@@ -1,0 +1,7 @@
+name: MW_Book_Frame
+version: Paper-1.16.5-MW-1
+description: This plugin allows the player to open book when right click itemframe with book in it.
+author: GHYNG
+main: org.mwage.mcPlugin.mw_book_frame.Main
+depend: [MW_Plugin_Main]
+api-version: 1.16
