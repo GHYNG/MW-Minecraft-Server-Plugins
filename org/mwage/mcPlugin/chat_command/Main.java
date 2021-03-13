@@ -1,9 +1,7 @@
 package org.mwage.mcPlugin.chat_command;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -11,34 +9,28 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.mwage.mcPlugin.chat_command.SoundNotifierListener.EventType;
+import org.mwage.mcPlugin.chat_command.SoundNotifierListener.SoundType;
 import org.mwage.mcPlugin.main.Main_GeneralMethods;
+import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
 @SuppressWarnings("deprecation")
-public class Main extends JavaPlugin {
+public class Main extends MWPlugin {
+	private MWC_PlayerSettings playerSettings;
 	public void onEnable() {
-		readyAllOnlinePlayers();
-		Bukkit.getPluginManager().registerEvents(new MainListener(), this);
-		Bukkit.getPluginManager().registerEvents(new AutoyoListener(), this);
+		playerSettings = new MWC_PlayerSettings(this);
+		playerSettings.readyPlayers();
+		registerListener(new MainListener(this));
+		registerListener(new AutoyoListener(this));
+		registerListener(new SoundNotifierListener(this));
 	}
-	/*
-	 * Ready all players who are currently online.
-	 */
-	public void readyAllOnlinePlayers() {
-		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
-		for(Player onlinePlayer : onlinePlayers) {
-			MWC_PlayerSettings.readyPlayer(onlinePlayer);
-		}
+	public MWC_PlayerSettings getPlayerSettings() {
+		return playerSettings;
 	}
 }
 class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods {
-	/*
-	 * Ready the player when they join.
-	 */
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		MWC_PlayerSettings.readyPlayer(player);
+	private Main plugin;
+	MainListener(Main plugin) {
+		this.plugin = plugin;
 	}
 	@SuppressWarnings("deprecation")
 	@EventHandler
@@ -66,8 +58,8 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 			secho(player, "哼，你没有mwc的权限！");
 			return;
 		}
-		MWC_PlayerSettings.readyPlayer(player);
-		MWC_PlayerSetting setting = MWC_PlayerSettings.get(player);
+		MWC_PlayerSettings settings = plugin.getPlayerSettings();
+		MWC_PlayerSetting setting = settings.get(player);
 		List<String> commands = event.getCommandParts();
 		int size = commands.size();
 		if(size == 0) {
@@ -77,7 +69,7 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 			lines.add("  deop - 将自己解除op");
 			lines.add("  autoyo <boolean> - 玩家加入的时候您将会自动发出“yooo！”");
 			lines.add("  location <command> - 关于一些坐标的操作");
-			lines.add("  listen <command> - 当一些指定的时间发生时，我会通知您！");
+			lines.add("  sn <command> - 当一些指定的时间发生时，我会通知您！");
 			String page = pageList(lines);
 			echo(player, page);
 		}
@@ -110,7 +102,7 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 					String line0 = "mwc autoyo 指令说明";
 					String line1 = "  true - 打开auto yooo";
 					String line2 = "  false - 关闭auto yooo";
-					String line3 = "  默认为false";
+					String line3 = "  默认为false，目前为" + setting.autoyo;
 					String page = page(line0, line1, line2, line3);
 					echo(player, page);
 				}
@@ -233,7 +225,44 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 					}
 				}
 			}
-			else if(c0.equalsIgnoreCase("listen")) {
+			else if(c0.equalsIgnoreCase("sn")) {
+				if(size < 3) {
+					List<Object> lines = new ArrayList<Object>();
+					lines.add("mwc sn 指令说明");
+					lines.add("  <event_type> <sound_type> - 选择某种事件的音效");
+					lines.add("  event_type:");
+					lines.add("    PlayerJoin - 玩家加入");
+					lines.add("    PlayerQuit - 玩家退出");
+					lines.add("    PlayerDeath - 玩家死亡");
+					lines.add("    PlayerChat - 玩家发出聊天信息");
+					lines.add("    All - 全部");
+					lines.add("  sound_type");
+					lines.add("    Piano - 钢琴");
+					lines.add("    Null - 关闭/无声音");
+					echo(player, pageList(lines));
+				}
+				else {
+					String c1 = commands.get(1).toLowerCase();
+					String c2 = commands.get(2).toLowerCase();
+					EventType et = EventType.get(c1);
+					SoundType st = SoundType.get(c2);
+					if(or(st == null, and(et == null, not(c1.equals("all"))))) {
+						unknownCommand(player);
+						return;
+					}
+					if(c1.equals("all")) {
+						EventType[] ets = EventType.values();
+						for(EventType e : ets) {
+							setting.sound_notifications.put(e, st);
+						}
+						mwcGood(player);
+						sechoOwner(player, line("已为您关注全部事件，并将声音选择为", st));
+						return;
+					}
+					mwcGood(player);
+					sechoOwner(player, line("已为您关注", et, "，并将声音选择为", st));
+					setting.sound_notifications.put(et, st);
+				}
 			}
 			else {
 				unknownCommand(player);

@@ -1,0 +1,6 @@
+Request-Versions:
+	Server:
+		Paper-1.16.5
+	DependOnPlugin:
+		MW-Plugin-Main:
+			Paper-1.16.5-MW-3

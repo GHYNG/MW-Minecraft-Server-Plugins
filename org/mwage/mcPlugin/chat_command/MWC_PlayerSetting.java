@@ -4,15 +4,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.mwage.mcPlugin.chat_command.SoundNotifierListener.EventType;
+import org.mwage.mcPlugin.chat_command.SoundNotifierListener.SoundType;
 import org.mwage.mcPlugin.main.Main_GeneralMethods;
-public class MWC_PlayerSetting implements Main_GeneralMethods {
-	public final Player player;
+import org.mwage.mcPlugin.main.standard.player.MWPlayerSetting;
+public class MWC_PlayerSetting extends MWPlayerSetting implements Main_GeneralMethods {
 	public boolean autoyo = false;
 	public final Map<String, Location> locations = new HashMap<String, Location>();
+	public final Map<EventType, SoundType> sound_notifications = new HashMap<EventType, SoundType>();
 	public MWC_PlayerSetting(Player player) {
-		this.player = player;
+		super(player);
+	}
+	public MWC_PlayerSetting(UUID uuid) {
+		super(uuid);
 	}
 	/*
 	 * Get information about stored locations.

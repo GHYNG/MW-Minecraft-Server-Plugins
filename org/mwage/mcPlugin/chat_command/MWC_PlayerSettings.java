@@ -1,18 +1,18 @@
 package org.mwage.mcPlugin.chat_command;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import org.bukkit.entity.Player;
-public class MWC_PlayerSettings {
-	private static Map<UUID, MWC_PlayerSetting> SETTINGS = new HashMap<UUID, MWC_PlayerSetting>();
-	public static void readyPlayer(Player player) {
-		UUID uuid = player.getUniqueId();
-		MWC_PlayerSetting setting = SETTINGS.get(uuid);
-		if(setting == null) {
-			SETTINGS.put(uuid, new MWC_PlayerSetting(player));
-		}
+import org.mwage.mcPlugin.main.standard.player.MWPlayerSettings;
+import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
+public class MWC_PlayerSettings extends MWPlayerSettings<MWC_PlayerSetting> {
+	public MWC_PlayerSettings(MWPlugin plugin) {
+		super(plugin);
 	}
-	public static MWC_PlayerSetting get(Player player) {
-		return SETTINGS.get(player.getUniqueId());
+	@Override
+	public MWC_PlayerSetting generatePlayerSetting(Player player) {
+		return new MWC_PlayerSetting(player);
+	}
+	@Override
+	public MWC_PlayerSetting generatePlayerSetting(UUID arg0) {
+		return new MWC_PlayerSetting(arg0);
 	}
 }
