@@ -2,6 +2,7 @@ package org.mwage.mcPlugin.main;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.server.ServerCommandEvent;
 /*
  * This interface contains methods relate to server generally,
@@ -95,11 +96,12 @@ public interface Main_GeneralMethods {
 	 * Make the server say things.
 	 */
 	default void serverSay(String message) {
+		CommandSender sender = Bukkit.getConsoleSender();
 		String command = "say " + message;
 		ServerCommandEvent event = new ServerCommandEvent(Bukkit.getConsoleSender(), command);
 		Bukkit.getServer().getPluginManager().callEvent(event);
 		if(!event.isCancelled()) {
-			Bukkit.broadcastMessage(message);
+			Bukkit.dispatchCommand(sender, command);
 		}
 	}
 	default <T> List<T> getNewList() {
