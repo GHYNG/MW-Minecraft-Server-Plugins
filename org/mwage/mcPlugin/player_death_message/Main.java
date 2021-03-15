@@ -21,6 +21,7 @@ class PlayerDeathListener implements Listener, Main_GeneralMethods {
 		Location location = player.getLocation();
 		String worldName = location.getWorld().getName();
 		int x = (int)location.getX(), y = (int)location.getY(), z = (int)location.getZ();
-		serverSay(line(name, "死于了", worldName, "世界，坐标为(", x, ", ", y, ", ", z, ")，", "祝您下次更幸运！"));
+		serverSay(line(name, "死于了", worldName, "世界，坐标为 (", x, ", ", y, ", ", z, ")"));
+		// serverSay(line(name, "死了：",worldName, ": (", x, ", ", y, ", ", z, ")"));
 	}
 }
