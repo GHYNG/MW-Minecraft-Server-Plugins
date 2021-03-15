@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
 	@Override
@@ -32,6 +33,16 @@ class ExplosionListener implements Listener {
 		List<Block> blocks = event.blockList();
 		event.setYield(0);
 		blocks.clear();
+	}
+	@EventHandler
+	public void onHangingBreak(HangingBreakEvent event) {
+		switch(event.getCause()) {
+			case EXPLOSION :
+				event.setCancelled(true);
+				return;
+			default :
+				return;
+		}
 	}
 }
 class EntityListener implements Listener {
