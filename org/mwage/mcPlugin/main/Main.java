@@ -22,18 +22,18 @@ class MainListener implements Listener, Main_GeneralMethods {
 		sendWelcomeMessage(player);
 		sendWelcomeSound(player);
 		String name = player.getName();
-		serverSay(line("»¶Ó­£¬", name, "£¡"));
+		serverSay(line("æ¬¢è¿ï¼Œ", name, "ï¼"));
 	}
 	@SuppressWarnings("deprecation")
 	public void sendWelcomeTitle(Player player) {
-		String title = ChatColor.AQUA + "»¶Ó­À´µ½MwageÄÌÂ·ĞÇÆğµØ£¡";
-		String subTitle = ChatColor.DARK_PURPLE + "Ô¸ĞÇºÓÓëÄãÍ¬ÔÚ£¬" + player.getName();
+		String title = ChatColor.AQUA + "æ¬¢è¿æ¥åˆ°Mwageå¥¶è·¯æ˜Ÿèµ·åœ°ï¼";
+		String subTitle = ChatColor.DARK_PURPLE + "æ„¿æ˜Ÿæ²³ä¸ä½ åŒåœ¨ï¼Œ" + player.getName();
 		player.sendTitle(title, subTitle);
 	}
 	public void sendWelcomeMessage(Player player) {
-		String line0 = ChatColor.AQUA + "»¶Ó­À´µ½ÄÌÂ··şÎñÆ÷£¡";
-		String line1 = ChatColor.AQUA + "¸¯ÖñÌØ±ğÌáĞÑ£ºÇë²»ÒªÔÚÖ÷ÊÀ½çÍÚ¿óÅ¶~";
-		String line2 = ChatColor.AQUA + "Èç¹ûÏëÍÚ¿ó£¬¿ÉÒÔÍ¨¹ı/warp mineÈ¥¿ó½ç£¨×ÊÔ´½ç£©ÍÚ¿óÅ¶£¡";
+		String line0 = ChatColor.AQUA + "æ¬¢è¿æ¥åˆ°å¥¶è·¯æœåŠ¡å™¨ï¼";
+		String line1 = ChatColor.AQUA + "è…ç«¹ç‰¹åˆ«æé†’ï¼šè¯·ä¸è¦åœ¨ä¸»ä¸–ç•ŒæŒ–çŸ¿å“¦~";
+		String line2 = ChatColor.AQUA + "å¦‚æœæƒ³æŒ–çŸ¿ï¼Œå¯ä»¥é€šè¿‡/warp mineå»çŸ¿ç•Œï¼ˆèµ„æºç•Œï¼‰æŒ–çŸ¿å“¦ï¼";
 		player.sendMessage(page(line0, line1, line2));
 	}
 	public void sendWelcomeSound(Player player) {

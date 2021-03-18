@@ -10,12 +10,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
 /**
- * Ò»¸ö¼¯ÖĞ¹ÜÀíËùÓĞÍæ¼ÒÉè¶¨µÄÀà¡£
- * µ±ĞÂµÄÍæ¼Ò¼ÓÈëÊ±£¬»á×Ô¶¯²úÉúÕâ¸öÍæ¼ÒµÄÉè¶¨£¨Èç¹ûÄÚ´æÖĞÃ»ÓĞËûµÄÉè¶¨µÄ»°£©¡£
+ * ä¸€ä¸ªé›†ä¸­ç®¡ç†æ‰€æœ‰ç©å®¶è®¾å®šçš„ç±»ã€‚
+ * å½“æ–°çš„ç©å®¶åŠ å…¥æ—¶ï¼Œä¼šè‡ªåŠ¨äº§ç”Ÿè¿™ä¸ªç©å®¶çš„è®¾å®šï¼ˆå¦‚æœå†…å­˜ä¸­æ²¡æœ‰ä»–çš„è®¾å®šçš„è¯ï¼‰ã€‚
  * 
  * @author GHYNG
  * @param <S>
- *            ´¢´æµ¥¸öÍæ¼ÒÉè¶¨µÄÀà
+ *            å‚¨å­˜å•ä¸ªç©å®¶è®¾å®šçš„ç±»
  */
 public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	/**
@@ -26,16 +26,28 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	 * Settings are stored into a hash map.
 	 */
 	private Map<UUID, S> SETTINGS = new HashMap<UUID, S>();
-	public MWPlayerSettings(MWPlugin plugin) {
+	/**
+	 * äº§ç”Ÿä¸€ä¸ªæ–°çš„ç®¡ç†æ‰€æœ‰åœ¨çº¿ç©å®¶è®¾å®šçš„å¯¹è±¡ã€‚
+	 * è¿™ä¸ªå¯¹è±¡å¿…é¡»åœ¨æ‰€å±çš„æ’ä»¶enabledä¹‹åå»ºç«‹ã€‚
+	 * 
+	 * @param plugin
+	 *            è¿™ä¸ªè®¾å®šç®¡ç†å¯¹è±¡æ‰€å±çš„æ’ä»¶å¯¹è±¡ã€‚
+	 * @throws CreationBeforeEnabledException
+	 *             å¦‚æœåœ¨æ’ä»¶enabledä¹‹å‰åˆ›å»ºæ­¤å¯¹è±¡ï¼ŒæŠ¥é”™ã€‚
+	 */
+	public MWPlayerSettings(MWPlugin plugin) throws CreationBeforeEnabledException {
+		if(!plugin.isEnabled()) {
+			throw new CreationBeforeEnabledException("PlayerSettings class must be created after plugin object is enabled.");
+		}
 		this.plugin = plugin;
 		this.plugin.registerListener(new SettingListener(this));
 		readyPlayers();
 	}
 	/**
-	 * ×¼±¸ºÃÒ»¸öÍæ¼ÒµÄÉè¶¨¡£
+	 * å‡†å¤‡å¥½ä¸€ä¸ªç©å®¶çš„è®¾å®šã€‚
 	 * 
 	 * @param player
-	 *            Ö¸¶¨µÄÍæ¼Ò¡£
+	 *            æŒ‡å®šçš„ç©å®¶ã€‚
 	 */
 	public void readyPlayer(Player player) {
 		UUID uuid = player.getUniqueId();
@@ -46,7 +58,7 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 		}
 	}
 	/**
-	 * ×¼±¸ºÃËùÓĞÍæ¼ÒµÄÉè¶¨¡£
+	 * å‡†å¤‡å¥½æ‰€æœ‰ç©å®¶çš„è®¾å®šã€‚
 	 */
 	public void readyPlayers() {
 		Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
@@ -55,40 +67,40 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 		}
 	}
 	/**
-	 * »ñÈ¡Ö¸¶¨Íæ¼ÒµÄÉè¶¨¡£
+	 * è·å–æŒ‡å®šç©å®¶çš„è®¾å®šã€‚
 	 * 
 	 * @param player
-	 *            Ö¸¶¨Íæ¼Ò¡£
-	 * @return Íæ¼ÒÉè¶¨¡£
+	 *            æŒ‡å®šç©å®¶ã€‚
+	 * @return ç©å®¶è®¾å®šã€‚
 	 */
 	public S get(Player player) {
 		readyPlayer(player);
 		return SETTINGS.get(player.getUniqueId());
 	}
 	/**
-	 * »ñÈ¡Ö¸¶¨Íæ¼ÒµÄÉè¶¨¡£
+	 * è·å–æŒ‡å®šç©å®¶çš„è®¾å®šã€‚
 	 * 
 	 * @param uuid
-	 *            Íæ¼ÒµÄuuid¡£
-	 * @return Íæ¼ÒÉè¶¨¡£
+	 *            ç©å®¶çš„uuidã€‚
+	 * @return ç©å®¶è®¾å®šã€‚
 	 */
 	public S get(UUID uuid) {
 		return SETTINGS.get(uuid);
 	}
 	/**
-	 * ³õÊ¼»¯Íæ¼ÒÉè¶¨¡£
+	 * åˆå§‹åŒ–ç©å®¶è®¾å®šã€‚
 	 * 
 	 * @param player
-	 *            Ö¸¶¨Íæ¼Ò¡£
-	 * @return Íæ¼ÒµÄÒ»¸öĞÂµÄÉè¶¨¡£
+	 *            æŒ‡å®šç©å®¶ã€‚
+	 * @return ç©å®¶çš„ä¸€ä¸ªæ–°çš„è®¾å®šã€‚
 	 */
 	public abstract S generatePlayerSetting(Player player);
 	/**
-	 * ³õÊ¼»¯Íæ¼ÒÉè¶¨¡£
+	 * åˆå§‹åŒ–ç©å®¶è®¾å®šã€‚
 	 * 
 	 * @param uuid
-	 *            Ö¸¶¨Íæ¼ÒµÄuuid¡£
-	 * @return Íæ¼ÒµÄÒ»¸öĞÂµÄÉè¶¨¡£
+	 *            æŒ‡å®šç©å®¶çš„uuidã€‚
+	 * @return ç©å®¶çš„ä¸€ä¸ªæ–°çš„è®¾å®šã€‚
 	 */
 	public abstract S generatePlayerSetting(UUID uuid);
 }

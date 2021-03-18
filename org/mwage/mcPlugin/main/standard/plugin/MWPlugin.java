@@ -8,8 +8,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mwage.mcPlugin.main.util.UtilCollection;
 /**
- * ÄÌÂ·±ê×¼²å¼şÀà¡£
- * Ã»ÓĞÌØÊâÇé¿öÏÂ£¬ËùÓĞÄÌÂ·²å¼şÀà¶¼Ó¦¸ÃÖ±½Ó¼Ì³ĞÕâ¸öÀà£¨¶ø²»ÊÇÏà»¥¼Ì³Ğ£©¡£
+ * å¥¶è·¯æ ‡å‡†æ’ä»¶ç±»ã€‚
+ * æ²¡æœ‰ç‰¹æ®Šæƒ…å†µä¸‹ï¼Œæ‰€æœ‰å¥¶è·¯æ’ä»¶ç±»éƒ½åº”è¯¥ç›´æ¥ç»§æ‰¿è¿™ä¸ªç±»ï¼ˆè€Œä¸æ˜¯ç›¸äº’ç»§æ‰¿ï¼‰ã€‚
  * 
  * @author GHYNG
  */
