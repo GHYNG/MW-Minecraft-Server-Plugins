@@ -1,0 +1,18 @@
+name: MW_Vote
+version: Paper-1.16.5-MW-1
+description: Milkyway voting system.
+author: GHYNG
+main: org.mwage.mcPlugin.vote.Main
+depend: [MW_Plugin_Main]
+api-version: 1.16
+
+commands:
+  vote-ban:
+    description: vote ban a player. half the players of total population required!
+    usage: Use /vote-ban <player-name> to vote ban a player. Half of the total population needed to successful ban!
+    permission: mw_vote.vote-ban
+    
+permissions:
+  mw_vote.vote-ban:
+    description: allows player to vote ban another player.
+    default: op
