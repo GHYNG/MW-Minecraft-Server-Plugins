@@ -52,7 +52,7 @@ class ChatListener implements Listener, ChatUtils {
 			fullName = ChatColor.DARK_GREEN + "[C] " + name;
 		}
 		if(player.getGameMode() == GameMode.SPECTATOR && (!player.isOp())) {
-			fullName = "[¹Û²ì] " + fullName;
+			fullName = "[è§‚å¯Ÿ] " + fullName;
 		}
 		String message = event.getMessage();
 		String completeMessage = fullName + ChatColor.WHITE + ": " + message;
@@ -73,42 +73,42 @@ class ChatListener implements Listener, ChatUtils {
 			String onlineName = onlinePlayer.getName();
 			if(message.toLowerCase().contains("@" + onlineName.toLowerCase())) {
 				playerReferencedSound(onlinePlayer);
-				String title = ChatColor.DARK_PURPLE + "Äã±»ÔÚÁÄÌìĞÅÏ¢ÖĞÌáµ½ÁË";
+				String title = ChatColor.DARK_PURPLE + "ä½ è¢«åœ¨èŠå¤©ä¿¡æ¯ä¸­æåˆ°äº†";
 				if(name.equals(onlineName)) {
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇÄã×Ô¼º");
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯ä½ è‡ªå·±");
 				}
 				else {
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇ" + fullName);
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯" + fullName);
 				}
 			}
 			else if(message.toLowerCase().contains("@owner") && isOwner(onlinePlayer)) {
 				playerReferencedSound(onlinePlayer);
-				String title = ChatColor.DARK_PURPLE + "·şÖ÷±»Ìáµ½ÁË";
+				String title = ChatColor.DARK_PURPLE + "æœä¸»è¢«æåˆ°äº†";
 				if(name.equals(onlineName)) {
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇÄã×Ô¼º");
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯ä½ è‡ªå·±");
 				}
 				else {
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇ" + fullName);
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯" + fullName);
 				}
 			}
 			else if((message.toLowerCase().contains("@manager") || message.toLowerCase().contains("@operator")) && onlinePlayer.isOp()) {
 				playerReferencedSound(onlinePlayer);
-				String title = ChatColor.DARK_PURPLE + "¹ÜÀíÔ±±»Ìáµ½ÁË";
+				String title = ChatColor.DARK_PURPLE + "ç®¡ç†å‘˜è¢«æåˆ°äº†";
 				if(name.equals(onlineName)) {
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇÄã×Ô¼º");
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯ä½ è‡ªå·±");
 				}
 				else {
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇ" + fullName);
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯" + fullName);
 				}
 			}
 			else if(message.toLowerCase().contains("@all")) {
 				playerReferencedSound(onlinePlayer);
-				String title = ChatColor.DARK_PURPLE + "ËùÓĞÈË¶¼±»Ìáµ½ÁË";
+				String title = ChatColor.DARK_PURPLE + "æ‰€æœ‰äººéƒ½è¢«æåˆ°äº†";
 				if(name.equals(onlineName)) {
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇÄã×Ô¼º");
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯ä½ è‡ªå·±");
 				}
 				else {
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇ" + fullName);
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯" + fullName);
 				}
 			}
 		}
@@ -130,8 +130,8 @@ class ChatListener implements Listener, ChatUtils {
 				String onlineName = onlinePlayer.getName();
 				if(message.toLowerCase().contains("@" + onlineName.toLowerCase())) {
 					playerReferencedSound(onlinePlayer);
-					String title = ChatColor.DARK_PURPLE + "Äã±»ÔÚÁÄÌìĞÅÏ¢ÖĞÌáµ½ÁË";
-					onlinePlayer.sendTitle(title, "Ìáµ½ÄãµÄÊÇ" + ChatColor.AQUA + "·şÎñÆ÷Äï");
+					String title = ChatColor.DARK_PURPLE + "ä½ è¢«åœ¨èŠå¤©ä¿¡æ¯ä¸­æåˆ°äº†";
+					onlinePlayer.sendTitle(title, "æåˆ°ä½ çš„æ˜¯" + ChatColor.AQUA + "æœåŠ¡å™¨å¨˜");
 				}
 				else {
 					// playerChatSound(onlinePlayer);
