@@ -1,5 +1,9 @@
 package org.mwage.mcPlugin.world_management;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -13,11 +17,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 interface MWWorldData {
-	public static final String RESOURCE_WORLD_NAME = "resource";
+	public static final String RESOURCE_WORLD_NAME = "mine2";
 	public static final String MAIN_WORLD_NAME = "world";
 }
 public class Main extends JavaPlugin {
@@ -25,6 +31,12 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(new SpawnListener(), this);
 		Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+	}
+}
+class MainListener implements Listener {
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
 	}
 }
 class SpawnListener implements Listener, MWWorldData {
@@ -42,17 +54,26 @@ class SpawnListener implements Listener, MWWorldData {
 	}
 }
 class PlayerListener implements Listener, MWWorldData {
-	private HashMap<Player, Integer> playerMineCount = new HashMap<Player, Integer>();
+	private Map<Player, Integer> playerMineCount = new HashMap<Player, Integer>();
+	private Set<Location> mainOreLocations = new HashSet<Location>();
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
 		Player player = event.getPlayer();
 		World world = player.getWorld();
 		String name = ChatColor.YELLOW + world.getName();
-		player.sendTitle(name, ChatColor.YELLOW + "ÓëÊÀ½çÍ¬²½Íê³É£¬ ÎäÔË²ıÂ¡£¡");
+		player.sendTitle(name, ChatColor.YELLOW + "ä¸ä¸–ç•ŒåŒæ­¥å®Œæˆï¼Œ æ­¦è¿æ˜Œéš†ï¼");
 		if(world.getName().equalsIgnoreCase(RESOURCE_WORLD_NAME)) {
-			String line0 = ChatColor.GOLD + "»¶Ó­À´µ½×ÊÔ´ÊÀ½ç£¬ Çë²»Òª²»Éè·À»¤µÄ´¹Ö±ÍÚ¿óÅ¶¡£";
+			String line0 = ChatColor.GOLD + "æ¬¢è¿æ¥åˆ°èµ„æºä¸–ç•Œï¼Œ è¯·ä¸è¦ä¸è®¾é˜²æŠ¤çš„å‚ç›´æŒ–çŸ¿å“¦ã€‚";
 			player.sendMessage(line0);
+		}
+	}
+	@EventHandler
+	public void onPlayerPlaceBlock(BlockPlaceEvent event) {
+		Block block = event.getBlock();
+		World world = block.getWorld();
+		if(world.getName().equalsIgnoreCase(MAIN_WORLD_NAME) && isOre(block)) {
+			mainOreLocations.add(block.getLocation());
 		}
 	}
 	@EventHandler
@@ -60,6 +81,9 @@ class PlayerListener implements Listener, MWWorldData {
 		Block block = event.getBlock();
 		World world = block.getWorld();
 		if(world.getName().equalsIgnoreCase(MAIN_WORLD_NAME) && isOre(block)) {
+			if(mainOreLocations.contains(block.getLocation())) {
+				return;
+			}
 			Player player = event.getPlayer();
 			GameMode gm = player.getGameMode();
 			if(gm != GameMode.SURVIVAL) {
@@ -75,11 +99,12 @@ class PlayerListener implements Listener, MWWorldData {
 				playerMineCount.put(player, count);
 			}
 			if(count % 5 == 0) {
-				String line0 = ChatColor.GOLD + player.getName() + "£¬ ÄúÕıÔÚÖ÷ÊÀ½çÍÚ¿ó£¡";
-				String line1 = ChatColor.GOLD + "×Ô´ÓÉÏ´Î·şÎñÆ÷ÖØÆôºó£¬ ÄúÒÑ¾­ÔÚÖ÷ÊÀ½çÍÚÁË" + count + "¸ö¿ó·½¿éÁË£¡";
-				String line2 = ChatColor.GOLD + "Çë²»ÒªÔÚÖ÷ÊÀ½ç¼ÌĞøÍÚ¿óÁË£¡";
-				String line3 = ChatColor.AQUA + "Èç¹ûÄúÔÚÆÆ»µ×Ô¼º·ÅÏÂµÄ¿ó·½¿é£¬ ¿ÉÒÔÎŞÊÓÕâÌõĞÅÏ¢¡£";
+				String line0 = ChatColor.GOLD + player.getName() + "ï¼Œ æ‚¨æ­£åœ¨ä¸»ä¸–ç•ŒæŒ–çŸ¿ï¼";
+				String line1 = ChatColor.GOLD + "è‡ªä»ä¸Šæ¬¡æœåŠ¡å™¨é‡å¯åï¼Œ æ‚¨å·²ç»åœ¨ä¸»ä¸–ç•ŒæŒ–äº†" + count + "ä¸ªçŸ¿æ–¹å—äº†ï¼";
+				String line2 = ChatColor.GOLD + "è¯·ä¸è¦åœ¨ä¸»ä¸–ç•Œç»§ç»­æŒ–çŸ¿äº†ï¼";
+				String line3 = ChatColor.AQUA + "å¦‚æœæ‚¨åœ¨ç ´åè‡ªå·±æ”¾ä¸‹çš„çŸ¿æ–¹å—ï¼Œ å¯ä»¥æ— è§†è¿™æ¡ä¿¡æ¯ã€‚";
 				player.sendMessage(lines(line0, line1, line2, line3));
+				warmOpPlayerMine(player);
 			}
 		}
 	}
@@ -98,6 +123,14 @@ class PlayerListener implements Listener, MWWorldData {
 				return true;
 			default :
 				return false;
+		}
+	}
+	public void warmOpPlayerMine(Player player) {
+		Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
+		for(Player onlinePlayer : onlinePlayers) {
+			if(onlinePlayer.isOp()) {
+				onlinePlayer.sendMessage(player.getName() + "æ­£åœ¨ä¸»ä¸–ç•ŒæŒ–çŸ¿");
+			}
 		}
 	}
 	public static String lines(String... lines) {
