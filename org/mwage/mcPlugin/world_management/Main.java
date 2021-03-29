@@ -19,24 +19,23 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 interface MWWorldData {
 	public static final String RESOURCE_WORLD_NAME = "mine2";
+	public static final String RESOURCE_WORLD_TITLE = "矿界";
 	public static final String MAIN_WORLD_NAME = "world";
+	public static final String MAIN_WORLD_TITLE = "主世界";
+	public static final String MAIN_NETHER_WORLD_NAME = "world_nether";
+	public static final String MAIN_NETHER_WORLD_TITLE = "下界";
+	public static final String MAIN_END_WORLD_NAME = "world_the_end";
+	public static final String MAIN_END_WORLD_TITLE = "末界";
 }
 public class Main extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(new SpawnListener(), this);
 		Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-	}
-}
-class MainListener implements Listener {
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
+		Bukkit.getPluginManager().registerEvents(new DisplayWorldTitleListener(), this);
 	}
 }
 class SpawnListener implements Listener, MWWorldData {
@@ -56,18 +55,6 @@ class SpawnListener implements Listener, MWWorldData {
 class PlayerListener implements Listener, MWWorldData {
 	private Map<Player, Integer> playerMineCount = new HashMap<Player, Integer>();
 	private Set<Location> mainOreLocations = new HashSet<Location>();
-	@SuppressWarnings("deprecation")
-	@EventHandler
-	public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
-		Player player = event.getPlayer();
-		World world = player.getWorld();
-		String name = ChatColor.YELLOW + world.getName();
-		player.sendTitle(name, ChatColor.YELLOW + "与世界同步完成， 武运昌隆！");
-		if(world.getName().equalsIgnoreCase(RESOURCE_WORLD_NAME)) {
-			String line0 = ChatColor.GOLD + "欢迎来到资源世界， 请不要不设防护的垂直挖矿哦。";
-			player.sendMessage(line0);
-		}
-	}
 	@EventHandler
 	public void onPlayerPlaceBlock(BlockPlaceEvent event) {
 		Block block = event.getBlock();
