@@ -1,5 +1,7 @@
 package org.mwage.mcPlugin.chat;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -27,15 +29,50 @@ interface ChatUtils {
 	default Server server() {
 		return Bukkit.getServer();
 	}
-	default String line(String... parts) {
+	default String line(Object... parts) {
 		String s = "";
-		for(String part : parts) {
+		for(Object part : parts) {
 			s += part;
 		}
 		return s;
 	}
+	default boolean and(boolean... bs) {
+		for(boolean b : bs) {
+			if(b == false) {
+				return false;
+			}
+		}
+		return true;
+	}
+	default boolean or(boolean... bs) {
+		for(boolean b : bs) {
+			if(b == true) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
-class ChatListener implements Listener, ChatUtils {
+interface April1Util extends ChatUtils {
+	default String getRandomColoredTitledName(Player player) {
+		String name = player.getName();
+		Random random = new Random();
+		int colorindex = random.nextInt(16);
+		int charindex = random.nextInt(26);
+		ChatColor color = ChatColor.values()[colorindex];
+		char c = (char)(65 + charindex);
+		String fullfront = line(color, "[", c, "] ", name);
+		return fullfront;
+	}
+	@SuppressWarnings("deprecation")
+	default boolean isApril1Day(Date date) {
+		return or(and(date.getMonth() == 2, date.getDate() == 31), and(date.getMonth() == 3, date.getDate() == 1));
+	}
+	default boolean isApril1Day() {
+		return isApril1Day(new Date());
+	}
+}
+class ChatListener implements Listener, ChatUtils, April1Util {
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayer(PlayerChatEvent event) {
@@ -53,6 +90,10 @@ class ChatListener implements Listener, ChatUtils {
 		}
 		if(player.getGameMode() == GameMode.SPECTATOR && (!player.isOp())) {
 			fullName = "[观察] " + fullName;
+		}
+		Date date = new Date();
+		if(isApril1Day(date)) {
+			fullName = getRandomColoredTitledName(player);
 		}
 		String message = event.getMessage();
 		String completeMessage = fullName + ChatColor.WHITE + ": " + message;
@@ -141,10 +182,18 @@ class ChatListener implements Listener, ChatUtils {
 	}
 	public void playerChatSound(Player player) {
 		Location location = player.getLocation();
+		if(isApril1Day(new Date())) {
+			player.playSound(location, Sound.ENTITY_VILLAGER_AMBIENT, SoundCategory.PLAYERS, 0.6f, 1.2f);
+			return;
+		}
 		player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.6f, 1.2f);
 	}
 	public void playerReferencedSound(Player player) {
 		Location location = player.getLocation();
+		if(isApril1Day(new Date())) {
+			player.playSound(location, Sound.ENTITY_WITCH_AMBIENT, SoundCategory.PLAYERS, 0.6f, 1.2f);
+			return;
+		}
 		player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.8f, 1.2f);
 	}
 }
