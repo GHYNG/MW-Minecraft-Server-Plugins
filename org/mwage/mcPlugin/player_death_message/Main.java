@@ -1,4 +1,6 @@
 package org.mwage.mcPlugin.player_death_message;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -14,14 +16,30 @@ public class Main extends JavaPlugin {
 	}
 }
 class PlayerDeathListener implements Listener, Main_GeneralMethods {
+	private List<String> broadcastWorldNames = new ArrayList<String>();
+	{
+		broadcastWorldNames.add("world");
+		broadcastWorldNames.add("world_the_end");
+		broadcastWorldNames.add("world_nether");
+		broadcastWorldNames.add("mine");
+		broadcastWorldNames.add("mine2");
+	}
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		String name = player.getName();
 		Location location = player.getLocation();
 		String worldName = location.getWorld().getName();
-		int x = (int)location.getX(), y = (int)location.getY(), z = (int)location.getZ();
-		serverSay(line(name, "À¿”⁄¡À", worldName, " ¿ΩÁ£¨◊¯±ÍŒ™ (", x, ", ", y, ", ", z, ")"));
-		// serverSay(line(name, "À¿¡À£∫",worldName, ": (", x, ", ", y, ", ", z, ")"));
+		boolean shouldBroadcast = false;
+		for(String bname : broadcastWorldNames) {
+			if(worldName.equalsIgnoreCase(bname)) {
+				shouldBroadcast = true;
+			}
+		}
+		if(shouldBroadcast) {
+			int x = (int)location.getX(), y = (int)location.getY(), z = (int)location.getZ();
+			serverSay(line(name, "Ê≠ª‰∫é‰∫Ü", worldName, "‰∏ñÁïåÔºåÂùêÊ†á‰∏∫ (", x, ", ", y, ", ", z, ")"));
+			// serverSay(line(name, "Ê≠ª‰∫ÜÔºö",worldName, ": (", x, ", ", y, ", ", z, ")"));
+		}
 	}
 }
