@@ -20,8 +20,8 @@ public class AutoyoListener implements Listener, Main_GeneralMethods {
 			if(!player.equals(joinPlayer)) {
 				MWC_PlayerSetting setting = settings.get(player);
 				if(setting.autoyo) {
-					player.chat("yooo£¡£¨·şÎñÆ÷Äï×¢£¬ÕâÊÇ¸¯Öñ¿ªÆôµÄ×Ô¶¯ÕĞºô£©");
-					// serverSay(line(player.getName(), "Ò²Î¯ÍĞÎÒÏòÄúÎÊºÃ£¡"));
+					player.chat("yoooï¼ï¼ˆæœåŠ¡å™¨å¨˜æ³¨ï¼Œè¿™æ˜¯è…ç«¹å¼€å¯çš„è‡ªåŠ¨æ‹›å‘¼ï¼‰");
+					// serverSay(line(player.getName(), "ä¹Ÿå§”æ‰˜æˆ‘å‘æ‚¨é—®å¥½ï¼"));
 				}
 			}
 		}

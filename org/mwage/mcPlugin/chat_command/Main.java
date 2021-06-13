@@ -55,7 +55,7 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 		Player player = event.getPlayer();
 		if(!isOwner(player)) {
 			mwcNotAllowed(player);
-			secho(player, "ºß£¬ÄãÃ»ÓĞmwcµÄÈ¨ÏŞ£¡");
+			secho(player, "å“¼ï¼Œä½ æ²¡æœ‰mwcçš„æƒé™ï¼");
 			return;
 		}
 		MWC_PlayerSettings settings = plugin.getPlayerSettings();
@@ -64,12 +64,12 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 		int size = commands.size();
 		if(size == 0) {
 			List<Object> lines = new ArrayList<Object>();
-			lines.add("mwc Ö¸ÁîËµÃ÷");
-			lines.add("  opme - ½«×Ô¼ºÉèÎªop");
-			lines.add("  deop - ½«×Ô¼º½â³ıop");
-			lines.add("  autoyo <boolean> - Íæ¼Ò¼ÓÈëµÄÊ±ºòÄú½«»á×Ô¶¯·¢³ö¡°yooo£¡¡±");
-			lines.add("  location <command> - ¹ØÓÚÒ»Ğ©×ø±êµÄ²Ù×÷");
-			lines.add("  sn <command> - µ±Ò»Ğ©Ö¸¶¨µÄÊ±¼ä·¢ÉúÊ±£¬ÎÒ»áÍ¨ÖªÄú£¡");
+			lines.add("mwc æŒ‡ä»¤è¯´æ˜");
+			lines.add("  opme - å°†è‡ªå·±è®¾ä¸ºop");
+			lines.add("  deop - å°†è‡ªå·±è§£é™¤op");
+			lines.add("  autoyo <boolean> - ç©å®¶åŠ å…¥çš„æ—¶å€™æ‚¨å°†ä¼šè‡ªåŠ¨å‘å‡ºâ€œyoooï¼â€");
+			lines.add("  location <command> - å…³äºä¸€äº›åæ ‡çš„æ“ä½œ");
+			lines.add("  sn <command> - å½“ä¸€äº›æŒ‡å®šçš„æ—¶é—´å‘ç”Ÿæ—¶ï¼Œæˆ‘ä¼šé€šçŸ¥æ‚¨ï¼");
 			String page = pageList(lines);
 			echo(player, page);
 		}
@@ -78,31 +78,31 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 			if(c0.equalsIgnoreCase("opme")) {
 				if(player.isOp()) {
 					mwcGood(player);
-					sechoOwner(player, "ÄúÒÑ¾­ÊÇOPÁË£¡");
+					sechoOwner(player, "æ‚¨å·²ç»æ˜¯OPäº†ï¼");
 				}
 				else {
 					player.setOp(true);
 					mwcGood(player);
-					sechoOwner(player, "ÄúÒÑ¾­»Ö¸´ÎªOP¡£");
+					sechoOwner(player, "æ‚¨å·²ç»æ¢å¤ä¸ºOPã€‚");
 				}
 			}
 			else if(c0.equalsIgnoreCase("deop")) {
 				if(!player.isOp()) {
 					mwcGood(player);
-					sechoOwner(player, "ÄúÒÑ¾­²»ÊÇOPÁË£¡");
+					sechoOwner(player, "æ‚¨å·²ç»ä¸æ˜¯OPäº†ï¼");
 				}
 				else {
 					player.setOp(false);
 					mwcGood(player);
-					sechoOwner(player, "ÄúÒÑ¾­½â³ıOP¡£");
+					sechoOwner(player, "æ‚¨å·²ç»è§£é™¤OPã€‚");
 				}
 			}
 			else if(c0.equalsIgnoreCase("autoyo")) {
 				if(size == 1) {
-					String line0 = "mwc autoyo Ö¸ÁîËµÃ÷";
-					String line1 = "  true - ´ò¿ªauto yooo";
-					String line2 = "  false - ¹Ø±Õauto yooo";
-					String line3 = "  Ä¬ÈÏÎªfalse£¬Ä¿Ç°Îª" + setting.autoyo;
+					String line0 = "mwc autoyo æŒ‡ä»¤è¯´æ˜";
+					String line1 = "  true - æ‰“å¼€auto yooo";
+					String line2 = "  false - å…³é—­auto yooo";
+					String line3 = "  é»˜è®¤ä¸ºfalseï¼Œç›®å‰ä¸º" + setting.autoyo;
 					String page = page(line0, line1, line2, line3);
 					echo(player, page);
 				}
@@ -111,12 +111,12 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 					if(c1.equalsIgnoreCase("true")) {
 						setting.autoyo = true;
 						mwcGood(player);
-						sechoOwner(player, "Äú´ò¿ªÁËautoyo£¬ÄúºÃÀÁÅ¶~»¹ÒªÎÒ°ïÄú´òÕĞºô~");
+						sechoOwner(player, "æ‚¨æ‰“å¼€äº†autoyoï¼Œæ‚¨å¥½æ‡’å“¦~è¿˜è¦æˆ‘å¸®æ‚¨æ‰“æ‹›å‘¼~");
 					}
 					else if(c1.equalsIgnoreCase("false")) {
 						setting.autoyo = false;
 						mwcGood(player);
-						sechoOwner(player, "Äú¹Ø±ÕÁËautoyo£¬¹ûÈ»´òÕĞºôÕâÖÖÊÂ»¹ÊÇÇ××Ô×ö±È½ÏºÃÄØ~");
+						sechoOwner(player, "æ‚¨å…³é—­äº†autoyoï¼Œæœç„¶æ‰“æ‹›å‘¼è¿™ç§äº‹è¿˜æ˜¯äº²è‡ªåšæ¯”è¾ƒå¥½å‘¢~");
 					}
 					else {
 						unknownCommand(player);
@@ -126,12 +126,12 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 			else if(c0.equalsIgnoreCase("location")) {
 				if(size == 1) {
 					List<Object> page = new ArrayList<Object>();
-					page.add("mwc location Ö¸ÁîËµÃ÷");
-					page.add("  add <identifier> - ´¢´æµ±Ç°µÄÎ»ÖÃ£¬²¢ÓÃ±êÊ¶·û±ê¼Ç");
-					page.add("  remove <identifier> - É¾³ıÖ¸¶¨µÄÎ»ÖÃ");
-					page.add("  list - ÏÔÊ¾´¢´æµÄËùÓĞÎ»ÖÃ");
-					page.add("  clear - Çå³ı´¢´æµÄËùÓĞÎ»ÖÃ");
-					page.add("  goto <identifier> - Ç°ÍùÖ¸¶¨µÄÎ»ÖÃ");
+					page.add("mwc location æŒ‡ä»¤è¯´æ˜");
+					page.add("  add <identifier> - å‚¨å­˜å½“å‰çš„ä½ç½®ï¼Œå¹¶ç”¨æ ‡è¯†ç¬¦æ ‡è®°");
+					page.add("  remove <identifier> - åˆ é™¤æŒ‡å®šçš„ä½ç½®");
+					page.add("  list - æ˜¾ç¤ºå‚¨å­˜çš„æ‰€æœ‰ä½ç½®");
+					page.add("  clear - æ¸…é™¤å‚¨å­˜çš„æ‰€æœ‰ä½ç½®");
+					page.add("  goto <identifier> - å‰å¾€æŒ‡å®šçš„ä½ç½®");
 					echo(player, pageList(page));
 				}
 				else {
@@ -139,43 +139,43 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 					if(c1.equalsIgnoreCase("add")) {
 						if(size == 2) {
 							List<Object> page = new ArrayList<Object>();
-							page.add("mwc location add Ö¸ÁîËµÃ÷");
-							page.add("  <identifier> - ĞÂÔöÎ»ÖÃµÄ±êÊ¶·û");
+							page.add("mwc location add æŒ‡ä»¤è¯´æ˜");
+							page.add("  <identifier> - æ–°å¢ä½ç½®çš„æ ‡è¯†ç¬¦");
 							echo(player, pageList(page));
 						}
 						else {
 							String c2 = commands.get(2);
 							if(!goodIdentifier(c2)) {
-								sechoOwner(player, "Õâ²»ÊÇºÏ·¨µÄ±êÊ¶·ûÓ´~");
+								sechoOwner(player, "è¿™ä¸æ˜¯åˆæ³•çš„æ ‡è¯†ç¬¦å“Ÿ~");
 								return;
 							}
 							Set<String> identifiers = setting.locations.keySet();
 							for(String identifier : identifiers) {
 								if(c2.equals(identifier)) {
-									sechoOwner(player, "Õâ¸ö±êÊ¶·ûÒÑ¾­ÓĞÁËÀ²£¡");
+									sechoOwner(player, "è¿™ä¸ªæ ‡è¯†ç¬¦å·²ç»æœ‰äº†å•¦ï¼");
 									return;
 								}
 							}
 							setting.locations.put(c2, player.getLocation());
 							mwcGood(player);
-							sechoOwner(player, line("½«µ±Ç°Î»ÖÃÉèÎª", c2));
+							sechoOwner(player, line("å°†å½“å‰ä½ç½®è®¾ä¸º", c2));
 						}
 					}
 					else if(c1.equalsIgnoreCase("remove")) {
 						if(size == 2) {
-							String line0 = "mwc location remove Ö¸ÁîËµÃ÷";
-							String line1 = "  <identifier> - É¾³ıµÄ±êÊ¶·û";
+							String line0 = "mwc location remove æŒ‡ä»¤è¯´æ˜";
+							String line1 = "  <identifier> - åˆ é™¤çš„æ ‡è¯†ç¬¦";
 							echo(player, page(line0, line1));
 						}
 						else {
 							String c2 = commands.get(2);
 							if(!setting.locations.containsKey(c2)) {
-								sechoOwner(player, line(c2, "²»ÊÇÒÑ´¢´æµÄÎ»ÖÃ¡£"));
+								sechoOwner(player, line(c2, "ä¸æ˜¯å·²å‚¨å­˜çš„ä½ç½®ã€‚"));
 							}
 							else {
 								setting.locations.remove(c2);
 								mwcGood(player);
-								sechoOwner(player, line(c2, "ÒÑ¾­É¾³ı¡£"));
+								sechoOwner(player, line(c2, "å·²ç»åˆ é™¤ã€‚"));
 							}
 						}
 					}
@@ -183,16 +183,16 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 						Set<String> keys = setting.locations.keySet();
 						int numKeys = keys.size();
 						if(numKeys == 0) {
-							sechoOwner(player, "Ã»ÓĞÕÒµ½ÈÎºÎÄú´¢´æµÄÎ»ÖÃÄØ£¡");
+							sechoOwner(player, "æ²¡æœ‰æ‰¾åˆ°ä»»ä½•æ‚¨å‚¨å­˜çš„ä½ç½®å‘¢ï¼");
 						}
 						else {
-							sechoOwner(player, page("Äú´¢´æÁËÒÔÏÂÎ»ÖÃ£º", setting.listLocations()));
+							sechoOwner(player, page("æ‚¨å‚¨å­˜äº†ä»¥ä¸‹ä½ç½®ï¼š", setting.listLocations()));
 						}
 					}
 					else if(c1.equalsIgnoreCase("goto")) {
 						if(size == 2) {
-							String line0 = "mwc location goto Ö¸ÁîËµÃ÷";
-							String line1 = "  <identifier> - ÄúÏëÒª´«ËÍÈ¥µÄµØµã";
+							String line0 = "mwc location goto æŒ‡ä»¤è¯´æ˜";
+							String line1 = "  <identifier> - æ‚¨æƒ³è¦ä¼ é€å»çš„åœ°ç‚¹";
 							echo(player, page(line0, line1));
 						}
 						else {
@@ -201,24 +201,24 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 								Location location = setting.locations.get(c2);
 								if(location == null) {
 									mwcBad(player);
-									sechoOwner(player, "³ö´íÁË£¡Ö¸¶¨µØµã¾¹È»ÊÇnull£¡");
+									sechoOwner(player, "å‡ºé”™äº†ï¼æŒ‡å®šåœ°ç‚¹ç«Ÿç„¶æ˜¯nullï¼");
 								}
 								else {
 									player.teleport(location);
 									mwcGood(player);
-									sechoOwner(player, "´«ËÍÒÑ¾­×¼±¸Íê±Ï£¬Ò»Â·Ë³·ç£¡");
+									sechoOwner(player, "ä¼ é€å·²ç»å‡†å¤‡å®Œæ¯•ï¼Œä¸€è·¯é¡ºé£ï¼");
 								}
 							}
 							else {
 								mwcBad(player);
-								sechoOwner(player, "Ã»ÓĞÕÒµ½Ö¸¶¨µÄÎ»ÖÃÄØ£¡");
+								sechoOwner(player, "æ²¡æœ‰æ‰¾åˆ°æŒ‡å®šçš„ä½ç½®å‘¢ï¼");
 							}
 						}
 					}
 					else if(c1.equalsIgnoreCase("clear")) {
 						setting.locations.clear();
 						mwcGood(player);
-						sechoOwner(player, "ÒÑ¾­ÎªÄúÉ¾³ıËùÓĞµØµã£¡");
+						sechoOwner(player, "å·²ç»ä¸ºæ‚¨åˆ é™¤æ‰€æœ‰åœ°ç‚¹ï¼");
 					}
 					else {
 						unknownCommand(player);
@@ -228,17 +228,17 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 			else if(c0.equalsIgnoreCase("sn")) {
 				if(size < 3) {
 					List<Object> lines = new ArrayList<Object>();
-					lines.add("mwc sn Ö¸ÁîËµÃ÷");
-					lines.add("  <event_type> <sound_type> - Ñ¡ÔñÄ³ÖÖÊÂ¼şµÄÒôĞ§");
+					lines.add("mwc sn æŒ‡ä»¤è¯´æ˜");
+					lines.add("  <event_type> <sound_type> - é€‰æ‹©æŸç§äº‹ä»¶çš„éŸ³æ•ˆ");
 					lines.add("  event_type:");
-					lines.add("    PlayerJoin - Íæ¼Ò¼ÓÈë");
-					lines.add("    PlayerQuit - Íæ¼ÒÍË³ö");
-					lines.add("    PlayerDeath - Íæ¼ÒËÀÍö");
-					lines.add("    PlayerChat - Íæ¼Ò·¢³öÁÄÌìĞÅÏ¢");
-					lines.add("    All - È«²¿");
+					lines.add("    PlayerJoin - ç©å®¶åŠ å…¥");
+					lines.add("    PlayerQuit - ç©å®¶é€€å‡º");
+					lines.add("    PlayerDeath - ç©å®¶æ­»äº¡");
+					lines.add("    PlayerChat - ç©å®¶å‘å‡ºèŠå¤©ä¿¡æ¯");
+					lines.add("    All - å…¨éƒ¨");
 					lines.add("  sound_type");
-					lines.add("    Piano - ¸ÖÇÙ");
-					lines.add("    Null - ¹Ø±Õ/ÎŞÉùÒô");
+					lines.add("    Piano - é’¢ç´");
+					lines.add("    Null - å…³é—­/æ— å£°éŸ³");
 					echo(player, pageList(lines));
 				}
 				else {
@@ -256,11 +256,11 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 							setting.sound_notifications.put(e, st);
 						}
 						mwcGood(player);
-						sechoOwner(player, line("ÒÑÎªÄú¹Ø×¢È«²¿ÊÂ¼ş£¬²¢½«ÉùÒôÑ¡ÔñÎª", st));
+						sechoOwner(player, line("å·²ä¸ºæ‚¨å…³æ³¨å…¨éƒ¨äº‹ä»¶ï¼Œå¹¶å°†å£°éŸ³é€‰æ‹©ä¸º", st));
 						return;
 					}
 					mwcGood(player);
-					sechoOwner(player, line("ÒÑÎªÄú¹Ø×¢", et, "£¬²¢½«ÉùÒôÑ¡ÔñÎª", st));
+					sechoOwner(player, line("å·²ä¸ºæ‚¨å…³æ³¨", et, "ï¼Œå¹¶å°†å£°éŸ³é€‰æ‹©ä¸º", st));
 					setting.sound_notifications.put(et, st);
 				}
 			}
@@ -273,10 +273,10 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 		player.sendMessage("" + message);
 	}
 	public void sechoOwner(Player player, Object message) {
-		serverSay(line("Ö÷ÈË", player.getName(), "£¬", message));
+		serverSay(line("ä¸»äºº", player.getName(), "ï¼Œ", message));
 	}
 	public void secho(Player player, Object message) {
-		serverSay(line(player.getName(), "£¬", message));
+		serverSay(line(player.getName(), "ï¼Œ", message));
 	}
 	public void mwcGood(Player player) {
 		Location location = player.getLocation();
@@ -292,6 +292,6 @@ class MainListener implements Listener, Main_GeneralMethods, MWC_GeneralMethods 
 	}
 	public void unknownCommand(Player player) {
 		mwcBad(player);
-		sechoOwner(player, "ÄúÊä´íÖ¸ÁîÀ²£¡ºÃ²Ë£¡");
+		sechoOwner(player, "æ‚¨è¾“é”™æŒ‡ä»¤å•¦ï¼å¥½èœï¼");
 	}
 }
