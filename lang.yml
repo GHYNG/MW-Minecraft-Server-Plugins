@@ -1,0 +1,13 @@
+# default language as chinese language
+
+# Vote Ban
+# <sender-player-name>: 投票发起者的id
+# <target-player-name>: 被投票者的id
+VoteBan-wrong-parameter: '参数数量错误：唯一参数为玩家id。'
+VoteBan-only-player-may-run-this-command: '只有玩家可以使用这条指令。'
+VoteBan-player-not-found: '未找到在线玩家<target-player-name>。'
+VoteBan-player-cancelled-vote: '您已经取消对玩家<target-player-name>，如果想要投票封禁该玩家，请再次输入本指令。'
+VoteBan-player-voted: '您已经为封禁玩家<target-player-name>投出一票，如果想要取消投票，请再次输入本指令。'
+VoteBan-started: '玩家<sender-player-name>提意封禁玩家<target-player-name>，如果您也同意，请输入/vote-ban <target-player-name>来投票。投票成功需要至少一半在线玩家同意。'
+VoteBan-you-are-banned: '您已经被服务器玩家投票封禁。如果您认为这是一次错误的封禁，请加群（541100688）联系管理员。'
+VoteBan-player-banned: '<target-player-name>已经被投票封禁。'

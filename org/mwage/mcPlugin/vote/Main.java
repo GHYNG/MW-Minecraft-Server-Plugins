@@ -1,5 +1,8 @@
 package org.mwage.mcPlugin.vote;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -9,49 +12,67 @@ import org.mwage.mcPlugin.main.Main_GeneralMethods;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
 public class Main extends MWPlugin implements Main_GeneralMethods {
 	private VotePlayerSettings playerSettings;
+	private VoteConfig voteConfig;
 	@Override
 	public void onEnable() {
+		initFiles();
 		playerSettings = new VotePlayerSettings(this);
+		voteConfig = new VoteConfig(this);
+	}
+	public void initFiles() {
+		List<String> fileNames = new ArrayList<String>();
+		fileNames.add("config.yml");
+		fileNames.add("lang_zh_cn.yml");
+		fileNames.add("lang.yml");
+		for(String fileName : fileNames) {
+			File file = new File(getDataFolder(), fileName);
+			if(!file.exists()) {
+				saveResource(fileName, false);
+			}
+		}
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(!command.getName().equalsIgnoreCase("vote-ban")) {
 			return false;
 		}
+		VoteConfig.LanguageConfig.VoteLanguageConfig vlc = voteConfig.languageConfig.voteLanguageConfig;
+		String senderName = sender.getName();
 		int argLength = args.length;
 		if(argLength != 1) {
-			sender.sendMessage("参数数量错误：唯一参数为玩家id。");
+			sender.sendMessage(vlc.convertMessage(vlc.wrong_parameter, senderName, "null"));
 			return false;
 		}
 		if(!(sender instanceof Player)) {
-			sender.sendMessage("只有玩家可以使用这条命令！");
+			sender.sendMessage(vlc.convertMessage(vlc.only_player_may_run_this_command, senderName, "null"));
 			return false;
 		}
 		Player target = Bukkit.getServer().getPlayer(args[0]);
+		String targetName = args[0];
 		if(target == null) {
-			sender.sendMessage("玩家" + args[0] + "目前不在线。");
-			return false;
+			sender.sendMessage(vlc.convertMessage(vlc.player_not_found, senderName, targetName));
+			return true;
 		}
-		String targetName = target.getName();
+		targetName = target.getName();
 		Player player = (Player)sender;
 		VotePlayerSetting setting = playerSettings.get(target);
 		if(setting.playersWantMeBanned.contains(player.getUniqueId())) {
 			setting.playersWantMeBanned.remove(player.getUniqueId());
-			sender.sendMessage("您已经取消对玩家" + targetName + "的投票封禁，如果想要投票封禁，请再次输入本指令。");
+			sender.sendMessage(vlc.convertMessage(vlc.player_cancelled_vote, senderName, targetName));
 		}
 		else {
 			setting.playersWantMeBanned.add(player.getUniqueId());
-			sender.sendMessage("您已经为封禁玩家" + targetName + "投出一票，如果想要取消投票，请再次输入本指令。");
+			sender.sendMessage(vlc.convertMessage(vlc.player_voted, senderName, targetName));;
 		}
 		Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 		int totalSize = onlinePlayers.size();
 		int voteSize = setting.playersWantMeBanned.size();
 		if(voteSize == 1) {
-			serverSay(player.getName() + "提意投票封禁" + targetName + "，如果您也同意，请输入 /vote-ban " + targetName + " 来投票。citizen及以上玩家可以投票。投票成功需要至少一半玩家总人数投票支持。");
+			serverSay(vlc.convertMessage(vlc.started, senderName, targetName));
 		}
 		if(voteSize * 2 >= totalSize) {
-			banPlayer(target, "您已经被服务器玩家投票封禁。如果您认为这是一次错误的封禁，请加群（541100688）联系管理员。");
-			serverSay(targetName + "已经被投票封禁。");
+			banPlayer(target, vlc.convertMessage(vlc.you_are_banned, senderName, targetName));
+			serverSay(vlc.convertMessage(vlc.player_banned, senderName, targetName));
 			setting.playersWantMeBanned.clear();
 		}
 		return true;
