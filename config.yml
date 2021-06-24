@@ -5,3 +5,7 @@
 # You can always add new language files.
 # Note: Use full file name with extension.
 language: 'lang.yml'
+
+# The percentage of number of players required to vote successfully.
+# Default: 0.5 (means 50%)
+vote-ban-percentage: 0.5

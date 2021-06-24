@@ -70,7 +70,7 @@ public class Main extends MWPlugin implements Main_GeneralMethods {
 		if(voteSize == 1) {
 			serverSay(vlc.convertMessage(vlc.started, senderName, targetName));
 		}
-		if(voteSize * 2 >= totalSize) {
+		if(voteSize >= totalSize * voteConfig.voteBanPercentage) {
 			banPlayer(target, vlc.convertMessage(vlc.you_are_banned, senderName, targetName));
 			serverSay(vlc.convertMessage(vlc.player_banned, senderName, targetName));
 			setting.playersWantMeBanned.clear();

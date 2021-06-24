@@ -7,10 +7,12 @@ public class VoteConfig {
 	public final Main plugin;
 	private FileConfiguration configFile;
 	public final LanguageConfig languageConfig;
+	public final double voteBanPercentage;
 	public VoteConfig(Main plugin) {
 		this.plugin = plugin;
 		configFile = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "config.yml"));
 		languageConfig = new LanguageConfig();
+		voteBanPercentage = configFile.getDouble("vote-ban-percentage", 0.5);
 	}
 	public class LanguageConfig {
 		private String lang = configFile.getString("language", "lang");
