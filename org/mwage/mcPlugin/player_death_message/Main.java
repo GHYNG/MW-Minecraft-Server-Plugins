@@ -23,6 +23,7 @@ class PlayerDeathListener implements Listener, Main_GeneralMethods {
 		broadcastWorldNames.add("world_nether");
 		broadcastWorldNames.add("mine");
 		broadcastWorldNames.add("mine2");
+		broadcastWorldNames.add("mine3");
 	}
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {

@@ -1,5 +1,5 @@
 name: MW_Player_Death_Message
-version: Paper-1.16.5-MW-1.2
+version: Paper-1.16.5-MW-1.2.1
 description: This plugin tells players the location and other information when they die.
 author: GHYNG
 main: org.mwage.mcPlugin.player_death_message.Main
