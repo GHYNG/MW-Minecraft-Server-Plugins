@@ -1,5 +1,5 @@
 name: MW_Chat
-version: Paper-1.16.5-MW-1.2.1(AF)
+version: Paper-1.16.5-MW-1.3
 description: This plugin manages players' chat. Colored title and sound. This plugin is temp. Future updates needed.
 author: GHYNG
 main: org.mwage.mcPlugin.chat.Main

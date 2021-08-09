@@ -14,14 +14,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.server.ServerCommandEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.mwage.mcPlugin.main.Main_GeneralMethods;
+import org.mwage.mcPlugin.main.standard.events.ServerChatEvent;
+import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
 @SuppressWarnings("deprecation")
-public class Main extends JavaPlugin {
+public class Main extends MWPlugin implements Main_GeneralMethods {
+	@Override
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+		// registerListener(new TabCompleteListener()); // this does not work.
+		registerListener(new ChatListener());
 	}
 }
-interface ChatUtils {
+interface ChatUtils extends Main_GeneralMethods {
 	default boolean isOwner(Player player) {
 		String name = player.getName();
 		return(name.equals("GHYNG") || name.equals("MWQJDOR") || name.equals("Antrooper"));
@@ -29,31 +33,12 @@ interface ChatUtils {
 	default Server server() {
 		return Bukkit.getServer();
 	}
-	default String line(Object... parts) {
-		String s = "";
-		for(Object part : parts) {
-			s += part;
-		}
-		return s;
-	}
-	default boolean and(boolean... bs) {
-		for(boolean b : bs) {
-			if(b == false) {
-				return false;
-			}
-		}
-		return true;
-	}
-	default boolean or(boolean... bs) {
-		for(boolean b : bs) {
-			if(b == true) {
-				return true;
-			}
-		}
-		return false;
+	default boolean calledOp(String message) {
+		message = message.toLowerCase();
+		return or(message.contains("@manager"), message.contains("@operator"), message.contains("@op"));
 	}
 }
-interface April1Util extends ChatUtils {
+interface April1Util extends ChatUtils, Main_GeneralMethods {
 	default String getRandomColoredTitledName(Player player) {
 		String name = player.getName();
 		Random random = new Random();
@@ -72,7 +57,7 @@ interface April1Util extends ChatUtils {
 		return isApril1Day(new Date());
 	}
 }
-class ChatListener implements Listener, ChatUtils, April1Util {
+class ChatListener implements Listener, April1Util, Main_GeneralMethods {
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayer(PlayerChatEvent event) {
@@ -132,7 +117,7 @@ class ChatListener implements Listener, ChatUtils, April1Util {
 					onlinePlayer.sendTitle(title, "提到你的是" + fullName);
 				}
 			}
-			else if((message.toLowerCase().contains("@manager") || message.toLowerCase().contains("@operator")) && onlinePlayer.isOp()) {
+			else if(and(onlinePlayer.isOp(), calledOp(message))) {
 				playerReferencedSound(onlinePlayer);
 				String title = ChatColor.DARK_PURPLE + "管理员被提到了";
 				if(name.equals(onlineName)) {
@@ -163,6 +148,12 @@ class ChatListener implements Listener, ChatUtils, April1Util {
 			while(message.startsWith(" ")) {
 				message = message.substring(1);
 			}
+			ServerChatEvent serverChatEvent = new ServerChatEvent(message);
+			callEvent(serverChatEvent);
+			message = serverChatEvent.getMessage();
+			if(serverChatEvent.isCancelled()) {
+				return;
+			}
 			String completeMessage = ChatColor.AQUA + "[S] Server" + ChatColor.WHITE + ": " + message;
 			Bukkit.getServer().broadcastMessage(completeMessage);
 			event.setCancelled(true);
@@ -172,6 +163,21 @@ class ChatListener implements Listener, ChatUtils, April1Util {
 				if(message.toLowerCase().contains("@" + onlineName.toLowerCase())) {
 					playerReferencedSound(onlinePlayer);
 					String title = ChatColor.DARK_PURPLE + "你被在聊天信息中提到了";
+					onlinePlayer.sendTitle(title, "提到你的是" + ChatColor.AQUA + "服务器娘");
+				}
+				else if(message.toLowerCase().contains("@owner") && isOwner(onlinePlayer)) {
+					playerReferencedSound(onlinePlayer);
+					String title = ChatColor.DARK_PURPLE + "服主被提到了";
+					onlinePlayer.sendTitle(title, "提到你的是" + ChatColor.AQUA + "服务器娘");
+				}
+				else if(and(onlinePlayer.isOp(), calledOp(message))) {
+					playerReferencedSound(onlinePlayer);
+					String title = ChatColor.DARK_PURPLE + "管理员被提到了";
+					onlinePlayer.sendTitle(title, "提到你的是" + ChatColor.AQUA + "服务器娘");
+				}
+				else if(message.toLowerCase().contains("@all")) {
+					playerReferencedSound(onlinePlayer);
+					String title = ChatColor.DARK_PURPLE + "所有人都被提到了";
 					onlinePlayer.sendTitle(title, "提到你的是" + ChatColor.AQUA + "服务器娘");
 				}
 				else {
