@@ -21,7 +21,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 interface MWWorldData {
-	public static final String RESOURCE_WORLD_NAME = "mine3";
+	public static final String RESOURCE_WORLD_NAME = "mine3.5";
 	public static final String RESOURCE_WORLD_TITLE = "矿界";
 	public static final String MAIN_WORLD_NAME = "world";
 	public static final String MAIN_WORLD_TITLE = "主世界";
