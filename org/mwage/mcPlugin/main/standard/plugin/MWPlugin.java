@@ -199,14 +199,16 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 * 
 	 * @param paths
 	 *            记录器的文件夹的路径。
+	 * @return 被注册的记录器。
 	 * @throws org.mwage.mcPlugin.main.standard.logger.LoggerRegisterFailedException
 	 *             未能成功产生新的记录器。
 	 */
-	public void registerLogger(Object... paths) {
+	public Logger registerLogger(Object... paths) {
 		Logger logger = new Logger(this, paths);
 		if(LOGGERS.containsKey(logger.FOLDER)) {
-			return;
+			return LOGGERS.get(logger.FOLDER);
 		}
 		LOGGERS.put(logger.FOLDER, logger);
+		return logger;
 	}
 }

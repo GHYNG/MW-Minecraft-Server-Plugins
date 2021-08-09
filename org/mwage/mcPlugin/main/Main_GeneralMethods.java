@@ -3,7 +3,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Event;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.mwage.mcPlugin.main.standard.events.ServerChatEvent;
 /*
  * This interface contains methods relate to server generally,
  * like broadcast messages.
@@ -99,9 +101,19 @@ public interface Main_GeneralMethods {
 		CommandSender sender = Bukkit.getConsoleSender();
 		String command = "say " + message;
 		ServerCommandEvent event = new ServerCommandEvent(Bukkit.getConsoleSender(), command);
-		Bukkit.getServer().getPluginManager().callEvent(event);
+		callEvent(event);
 		if(!event.isCancelled()) {
-			Bukkit.dispatchCommand(sender, command);
+			command = event.getCommand();
+			if(command.startsWith("say ")) {
+				message = command.substring("say ".length()) + "";
+				ServerChatEvent event1 = new ServerChatEvent(message);
+				callEvent(event1);
+				if(!event1.isCancelled()) {
+					message = event1.getMessage();
+					command = "say " + message;
+					Bukkit.dispatchCommand(sender, command);
+				}
+			}
 		}
 	}
 	default <T> List<T> getNewList() {
@@ -122,5 +134,8 @@ public interface Main_GeneralMethods {
 			return true;
 		}
 		return false;
+	}
+	default void callEvent(Event event) {
+		Bukkit.getServer().getPluginManager().callEvent(event);
 	}
 }

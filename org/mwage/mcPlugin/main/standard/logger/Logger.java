@@ -1,7 +1,5 @@
 package org.mwage.mcPlugin.main.standard.logger;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
+import org.mwage.mcPlugin.main.util.io.BufferedFile;
 /**
  * 记录器。
  * <p>
@@ -87,6 +86,7 @@ public class Logger {
 	 */
 	public void logFiles() {
 		PLUGIN.generatePluginFolder();
+		FOLDER.mkdirs();
 		Collections.sort(logLines);
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		Map<String, List<LogLine<?>>> files = new HashMap<String, List<LogLine<?>>>();
@@ -98,22 +98,24 @@ public class Logger {
 			files.get(fileName).add(logLine);
 		}
 		for(String fileName : files.keySet()) {
-			File file = new File(PLUGIN.getLogsFolder(true), fileName);
+			File file = new File(FOLDER, fileName);
 			if(!file.exists()) {
 				try {
 					file.createNewFile();
-					BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-					List<LogLine<?>> lines = files.get(fileName);
-					for(LogLine<?> line : lines) {
-						bw.write(line.toString());
-						bw.newLine();
-						logLines.remove(line);
-					}
-					bw.close();
 				}
 				catch(IOException e) {
+					e.printStackTrace();
 				}
 			}
+			BufferedFile bf = new BufferedFile(file);
+			bf.read();
+			List<Object> filelines = bf.getLines();
+			List<LogLine<?>> lines = files.get(fileName);
+			for(LogLine<?> line : lines) {
+				filelines.add(line);
+				logLines.remove(line);
+			}
+			bf.write();
 		}
 		logLines.clear();
 	}
