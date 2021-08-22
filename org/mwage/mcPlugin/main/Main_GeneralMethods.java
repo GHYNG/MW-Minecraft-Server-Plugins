@@ -1,141 +1,54 @@
 package org.mwage.mcPlugin.main;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event;
-import org.bukkit.event.server.ServerCommandEvent;
-import org.mwage.mcPlugin.main.standard.events.ServerChatEvent;
+import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
+import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
+import org.mwage.mcPlugin.main.util.methods.LogicUtil;
+import org.mwage.mcPlugin.main.util.methods.ServerUtil;
+import org.mwage.mcPlugin.main.util.methods.StringUtil;
 /*
  * This interface contains methods relate to server generally,
  * like broadcast messages.
  * Also contains other tool methods, like those related to String.
  */
-public interface Main_GeneralMethods {
-	/*
-	 * To connect string parts to a new string.
+/**
+ * 奶路主插件的零散功能。
+ * <p>
+ * 这是个便于调用的集成接口。
+ * 实际功能在{@link org.mwage.mcPlugin.main.util.methods}包中。
+ * 
+ * @author GHYNG
+ */
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0, currentlyAt = 1))
+public interface Main_GeneralMethods extends StringUtil, LogicUtil, ServerUtil {
+	/**
+	 * 返回一个列表的实例{@link ArrayList}，
+	 * 让调用类不需要自己调用{@code ArrayList}。
+	 * 
+	 * @param <T>
+	 *            列表的元素类型。
+	 * @return 新的列表实例。
 	 */
-	default String line(Object... parts) {
-		String line = "";
-		for(Object part : parts) {
-			line += part;
-		}
-		return line;
-	}
-	default String lineList(List<Object> parts) {
-		String line = "";
-		for(Object part : parts) {
-			line += part;
-		}
-		return line;
-	}
-	/*
-	 * To connect lines to a page, separated by \n.
-	 */
-	default String page(Object... lines) {
-		int length = lines.length;
-		if(length == 0) {
-			return "";
-		}
-		String page = "";
-		for(int i = 0; i < length - 1; i++) {
-			page += lines[i] + "\n";
-		}
-		page += lines[length - 1];
-		return page;
-	}
-	default String pageList(List<Object> lines) {
-		int length = lines.size();
-		if(length == 0) {
-			return "";
-		}
-		String page = "";
-		for(int i = 0; i < length - 1; i++) {
-			page += lines.get(i) + "\n";
-		}
-		page += lines.get(length - 1);
-		return page;
-	}
-	/*
-	 * Logic NOT.
-	 */
-	default boolean not(boolean b) {
-		return !b;
-	}
-	/*
-	 * Logic AND.
-	 */
-	default boolean and(boolean... bs) {
-		boolean r = true;
-		for(boolean b : bs) {
-			r &= b;
-		}
-		return r;
-	}
-	/*
-	 * logic OR.
-	 */
-	default boolean or(boolean... bs) {
-		boolean r = false;
-		for(boolean b : bs) {
-			r |= b;
-		}
-		return r;
-	}
-	/*
-	 * Logic NAND.
-	 */
-	default boolean nand(boolean... bs) {
-		return not(and(bs));
-	}
-	/*
-	 * Logic NOR.
-	 */
-	default boolean nor(boolean... bs) {
-		return not(or(bs));
-	}
-	/*
-	 * Make the server say things.
-	 */
-	default void serverSay(String message) {
-		CommandSender sender = Bukkit.getConsoleSender();
-		String command = "say " + message;
-		ServerCommandEvent event = new ServerCommandEvent(Bukkit.getConsoleSender(), command);
-		callEvent(event);
-		if(!event.isCancelled()) {
-			command = event.getCommand();
-			if(command.startsWith("say ")) {
-				message = command.substring("say ".length()) + "";
-				ServerChatEvent event1 = new ServerChatEvent(message);
-				callEvent(event1);
-				if(!event1.isCancelled()) {
-					message = event1.getMessage();
-					command = "say " + message;
-					Bukkit.dispatchCommand(sender, command);
-				}
-			}
-		}
-	}
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	default <T> List<T> getNewList() {
 		List<T> list = new ArrayList<T>();
 		return list;
 	}
-	default boolean goodIdentifier(String identifier) {
-		if(identifier == null || identifier.length() < 1) {
-			return false;
+	/**
+	 * 将数组转化为列表。
+	 * 
+	 * @param <T>
+	 *            元素的类型。
+	 * @param array
+	 *            需要的数组。
+	 * @return 产生的列表。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	default <T> List<T> arrayToList(T[] array) {
+		List<T> list = getNewList();
+		for(T t : array) {
+			list.add(t);
 		}
-		int index = 0;
-		if(Character.isJavaIdentifierStart(identifier.charAt(index))) {
-			while(++index < identifier.length()) {
-				if(!Character.isJavaIdentifierPart(identifier.charAt(index))) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-	default void callEvent(Event event) {
-		Bukkit.getServer().getPluginManager().callEvent(event);
+		return list;
 	}
 }

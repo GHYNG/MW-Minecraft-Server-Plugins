@@ -1,4 +1,8 @@
 package org.mwage.mcPlugin.main.standard.player;
+
+import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
+import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
+
 /**
  * 当PlayerSettings类在所属插件enabled之前就被创建，
  * 就会产生此错误。
@@ -9,7 +13,9 @@ package org.mwage.mcPlugin.main.standard.player;
  * @author GHYNG
  */
 @SuppressWarnings("serial")
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 public class CreationBeforeEnabledException extends RuntimeException {
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public CreationBeforeEnabledException(String message) {
 		super(message);
 	}

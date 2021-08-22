@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
+import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
 import org.mwage.mcPlugin.main.standard.logger.Logger;
+import org.mwage.mcPlugin.main.standard.plugin.config.MWPluginConfiguration;
 import org.mwage.mcPlugin.main.util.UtilCollection;
 /**
  * 奶路标准插件类。
@@ -18,21 +21,38 @@ import org.mwage.mcPlugin.main.util.UtilCollection;
  * 
  * @author GHYNG
  */
+@SuppressWarnings("deprecation")
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
-	private final Map<File, Logger> LOGGERS = new HashMap<File, Logger>();
+	/**
+	 * 获取当前插件的奶路API版本。
+	 * 
+	 * @return API版本。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	public abstract int getAPIVersion();
+	/**
+	 * 用于记录log文件的各个记录器。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	private final Map<File, Logger> loggers = new HashMap<File, Logger>();
 	/**
 	 * 收到确认的奶路插件列表。
 	 * 奶路插件之间可以进行互动。
 	 * 这个功能仍在建设。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	private final Map<String, MWPlugin> reconigizedMWPlugins = new HashMap<String, MWPlugin>();
 	/**
-	 * 通用设置。
-	 * <p>
-	 * 通用设置指的是不同的奶路插件可以共享的设置。
-	 * 在调用设置时，将会优先调用上级奶路插件的设定。
+	 * 这个插件的所有上级奶路插件。
 	 */
-	protected final Map<String, FileConfiguration> GENERAL_CONFIGURATIONS = new HashMap<String, FileConfiguration>();
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	protected final List<MWPlugin> parentPlugins = new ArrayList<MWPlugin>();
+	/**
+	 * 这个插件的所有下级奶路插件。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	protected final List<MWPlugin> childPlugins = new ArrayList<MWPlugin>();
 	/**
 	 * 这个列表中的文件将会被导出到插件文件夹中，
 	 * 如果插件文件夹中不存在该文件。
@@ -40,18 +60,25 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 * <p>
 	 * 注意：这些文件路径中应当已经包含插件文件夹的路径。
 	 */
-	protected final List<File> PACKAGE_FILES = new ArrayList<File>();
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	protected final List<File> packageFiles = new ArrayList<File>();
+	/**
+	 * 本奶路插件的配置文件系统。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	protected final MWPluginConfiguration config = new MWPluginConfiguration(this);
 	/**
 	 * 将指定的，插件包中的文件，写入插件文件夹中。
 	 * <p>
-	 * 事实上，这个方法是将{@link #PACKAGE_FILES}中的文件输出到插件文件夹中。
+	 * 事实上，这个方法是将{@link #packageFiles}中的文件输出到插件文件夹中。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	protected void writePackageFiles() {
 		File dataFolder = getDataFolder();
 		if(!dataFolder.exists()) {
 			dataFolder.mkdirs();
 		}
-		for(File file : PACKAGE_FILES) {
+		for(File file : packageFiles) {
 			if(!file.exists()) {
 				String fileName = file.getName();
 				saveResource(fileName, false);
@@ -65,6 +92,7 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 * @param paths
 	 *            文件的路径。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	protected void registerPackageFiles(Object... paths) {
 		String sep = File.separator;
 		int length = paths.length;
@@ -77,39 +105,79 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 		}
 		completePath += paths[length - 1];
 		File file = new File(completePath);
-		PACKAGE_FILES.add(file);
+		packageFiles.add(file);
 	}
 	/**
 	 * 为这个插件注册一个新的事件监听器。
+	 * 相当于{@code Bukkit.getPluginManager().registerEvents(listener, this);}。
 	 * 
 	 * @param listener
 	 *            事件监听器。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public void registerListener(Listener listener) {
 		Bukkit.getPluginManager().registerEvents(listener, this);
 	}
-	public void reconigizeMWPlugin(String name) {
+	/**
+	 * 辨认在同一个服务器中运行的所有奶路插件。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	public void reconigizeMWPlugins() {
 		PluginManager pluginManager = Bukkit.getPluginManager();
-		Plugin plugin = pluginManager.getPlugin(name);
-		if(plugin instanceof MWPlugin) {
-			MWPlugin mp = (MWPlugin)plugin;
-			reconigizedMWPlugins.put(name, mp);
+		Plugin[] plugins = pluginManager.getPlugins();
+		for(Plugin plugin : plugins) {
+			if(plugin instanceof MWPlugin mp) {
+				String name = mp.getName();
+				reconigizedMWPlugins.put(name, mp);
+			}
 		}
+		PluginDescriptionFile pdf = getDescription();
+		pdf.getDepend().forEach((name) -> {
+			MWPlugin parent = reconigizedMWPlugins.get(name);
+			if(parent != null) {
+				parentPlugins.add(parent);
+				parent.childPlugins.add(this);
+			}
+		});
+		pdf.getSoftDepend().forEach((name) -> {
+			MWPlugin parent = reconigizedMWPlugins.get(name);
+			if(parent != null) {
+				parentPlugins.add(parent);
+			}
+		});
 	}
 	/**
 	 * 获取上级奶路插件。
 	 * 这些插件必须是正在激活状态中的。
 	 * 这个方法只会返回直接上级插件，
 	 * 间接上级则不会返回。
+	 * 这个列表是根据{@code plugin.yml}中指定的顺序排列的。
 	 * <p>
-	 * 这个方法每一次调用时，
-	 * 都会遍历服务器正在运行的所有插件，
-	 * 因此应当谨慎使用该方法。
+	 * 为了保护列表的稳定，
+	 * 这个插件返回的是一个插件列表的副本。
+	 * 对返回的列表进行改动不会改变实际列表。
 	 * 
-	 * @return 上级奶路插件列表。
+	 * @return 上级奶路插件列表的复制。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public List<MWPlugin> getParentMWPlugins() {
-		return null; // XXX unfinished.
+		return copyList(parentPlugins);
+	}
+	/**
+	 * 获取下级奶路插件。
+	 * 这些插件必须是正在激活状态中的。
+	 * 这个方法只会返回直接下级插件，
+	 * 间接下级则不会返回。
+	 * 这个列表是根据{@code plugin.yml}中指定的顺序排列的。
+	 * <p>
+	 * 为了保护列表的稳定，
+	 * 这个插件返回的是一个插件列表的副本。
+	 * 对返回的列表进行改动不会改变实际列表。
+	 * 
+	 * @return 下级奶路插件列表的复制。
+	 */
+	public List<MWPlugin> getChildMWPlugins() {
+		return copyList(childPlugins);
 	}
 	/**
 	 * 产生该插件的插件文件夹。
@@ -122,6 +190,7 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 * logs
 	 * }
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public void generatePluginFolder() {
 		File folderPlugin = getDataFolder();
 		List<String> subFolderNames = new ArrayList<String>();
@@ -144,6 +213,7 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 *            如果{@code true}，且该文件夹尚不存在，则产生一个新文件夹。
 	 * @return 文件夹。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public File getConfigsGeneralFolder(boolean mkdirs) {
 		File folder = new File(getDataFolder(), "configs_general");
 		if(mkdirs) {
@@ -162,6 +232,7 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 *            如果{@code true}，且该文件夹尚不存在，则产生一个新文件夹。
 	 * @return 文件夹。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public File getConfigsGeneralForceFolder(boolean mkdirs) {
 		File folder = new File(getDataFolder(), "configs_general_force");
 		if(mkdirs) {
@@ -178,6 +249,7 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 *            如果{@code true}，且该文件夹尚不存在，则产生一个新文件夹。
 	 * @return 文件夹。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public File getLogsFolder(boolean mkdirs) {
 		File folder = new File(getDataFolder(), "logs");
 		if(mkdirs) {
@@ -188,9 +260,10 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	/**
 	 * 将目前所有缓存中的记录写进文件。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public final void logAll() {
-		for(File folder : LOGGERS.keySet()) {
-			Logger logger = LOGGERS.get(folder);
+		for(File folder : loggers.keySet()) {
+			Logger logger = loggers.get(folder);
 			logger.logFiles();
 		}
 	}
@@ -203,12 +276,87 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 * @throws org.mwage.mcPlugin.main.standard.logger.LoggerRegisterFailedException
 	 *             未能成功产生新的记录器。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public Logger registerLogger(Object... paths) {
 		Logger logger = new Logger(this, paths);
-		if(LOGGERS.containsKey(logger.FOLDER)) {
-			return LOGGERS.get(logger.FOLDER);
+		if(loggers.containsKey(logger.FOLDER)) {
+			return loggers.get(logger.FOLDER);
 		}
-		LOGGERS.put(logger.FOLDER, logger);
+		loggers.put(logger.FOLDER, logger);
 		return logger;
+	}
+	/**
+	 * 当插件被激活时的程序。
+	 * <p>
+	 * 它将产生一个插件文件夹系统，
+	 * 辨认其它奶路文件夹，
+	 * 然后启动子插件指定的程序（{@link #onMWEnable()}）。
+	 * 
+	 * @deprecated 子插件应该调用{@link #onMWEnable()}作为替代。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	@Override
+	@Deprecated
+	public void onEnable() {
+		generatePluginFolder();
+		reconigizeMWPlugins();
+		onMWEnable();
+	}
+	/**
+	 * 奶路插件用于替代{@link #onEnable()}的方法。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	public void onMWEnable() {
+		// does nothing
+	}
+	/**
+	 * 当插件停止激活时的程序。
+	 * <p>
+	 * 它将记录所有需要的log。
+	 * 
+	 * @deprecated 子插件应该调用{@link #onMWDisable()}作为替代。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	@Override
+	@Deprecated
+	public void onDisable() {
+		logAll();
+		onMWDisable();
+	}
+	/**
+	 * 奶路插件用于替代{@link #onDisable()}的方法。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	public void onMWDisable() {
+		// does nothinge
+	}
+	/**
+	 * 将这个插件启动。
+	 * 相当于使用{@code setEnabled(true);}。
+	 * <p>
+	 * 谨慎使用这个功能！
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	public void turnOn() {
+		setEnabled(true);
+	}
+	/**
+	 * 将这个插件关闭。
+	 * 相当于使用{@code setEnabled(false);}。
+	 * <p>
+	 * 谨慎使用这个功能！
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	public void turnOff() {
+		setEnabled(false);
+	}
+	/**
+	 * 获得本插件的配置管理类。
+	 * 
+	 * @return 管理配置的类的对象。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	public MWPluginConfiguration getMWConfig() {
+		return config;
 	}
 }

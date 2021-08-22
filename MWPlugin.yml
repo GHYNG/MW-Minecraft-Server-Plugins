@@ -1,0 +1,8 @@
+# You should not modify this file in the \plugin folder.
+# This file should be modified only in developing process.
+
+# The mw api version for this plugin.
+# The MW Plugins depend on each other to work.
+# Wrong api-version will result in disfunction in many MW Plugins.
+# Note: This api-version is different from plugin-version provided in plugin.yml.
+mw-api-version: '1'

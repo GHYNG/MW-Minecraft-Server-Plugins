@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
+import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
 import org.mwage.mcPlugin.main.util.io.BufferedFile;
 /**
@@ -21,18 +23,22 @@ import org.mwage.mcPlugin.main.util.io.BufferedFile;
  * 
  * @author GHYNG
  */
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 public class Logger {
 	/**
 	 * 这个记录器所属的插件。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public final MWPlugin PLUGIN;
 	/**
 	 * 这个记录器负责的文件夹。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public final File FOLDER;
 	/**
 	 * 记录的具体行的列表。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	private List<LogLine<?>> logLines = new ArrayList<LogLine<?>>();
 	/**
 	 * 根据给定的路径作为储存文件夹，
@@ -44,6 +50,7 @@ public class Logger {
 	 *            指定的路径。
 	 *            这个路径将在{@code [plugin-folder]\logs}中。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public Logger(MWPlugin plugin, Object... paths) {
 		String sep = File.separator;
 		int length = paths.length;
@@ -69,6 +76,7 @@ public class Logger {
 	 * @param logLine
 	 *            新的记录。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public void log(LogLine<?> logLine) {
 		logLines.add(logLine);
 	}
@@ -78,12 +86,14 @@ public class Logger {
 	 * @param object
 	 *            新的记录。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public void logObject(Object object) {
 		logLines.add(new LogLine<>(object));
 	}
 	/**
 	 * 将缓存中的记录写入文件，然后清空缓存。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public void logFiles() {
 		PLUGIN.generatePluginFolder();
 		FOLDER.mkdirs();

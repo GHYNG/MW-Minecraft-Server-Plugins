@@ -1,4 +1,6 @@
 package org.mwage.mcPlugin.main.standard;
+import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
+import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
 /**
  * 用于存放某一个事物（比如玩家、世界）的设定信息的类。
  * 注意，这些设定信息是暂时的，将在下一次reload时重置。
@@ -10,7 +12,10 @@ package org.mwage.mcPlugin.main.standard;
  * @author GHYNG
  * @param <I>
  *            身份对象的类型。
+ * @deprecated 未完成建设，请勿使用。
  */
+@Deprecated
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0, openToSubPlugin = false))
 public abstract class MWSetting<I> {
 	/**
 	 * 身份对象。

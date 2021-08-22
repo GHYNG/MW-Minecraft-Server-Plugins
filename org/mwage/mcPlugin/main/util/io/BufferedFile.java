@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
+import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
 /**
  * 有缓存区的文件。
  * <p>
@@ -19,21 +21,38 @@ import java.util.List;
  * 
  * @author GHYNG
  */
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 public class BufferedFile extends File {
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1, openToSubPlugin = false))
 	private static final long serialVersionUID = 1L;
+	/**
+	 * 存在缓冲中的文件各行。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1, openToSubPlugin = false))
 	private final List<Object> lines = new ArrayList<Object>();
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public BufferedFile(File parend, String child) {
 		super(parend, child);
 	}
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public BufferedFile(String pathname) {
 		super(pathname);
 	}
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public BufferedFile(String parent, String child) {
 		super(parent, child);
 	}
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public BufferedFile(URI uri) {
 		super(uri);
 	}
+	/**
+	 * 根据给定的文件创建一个{@code BufferedFile}对象。
+	 * 
+	 * @param file
+	 *            给定的文件。
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public BufferedFile(File file) {
 		super(file.getPath());
 	}
@@ -79,5 +98,15 @@ public class BufferedFile extends File {
 		catch(IOException e) {
 			e.printStackTrace();
 		}
+	}
+	/**
+	 * 在产生这个文件前，确保所有上级文件夹已经产生。
+	 * 如果没有产生，则先产生上级文件夹。
+	 */
+	@Override
+	public boolean createNewFile() throws IOException {
+		File parent = getParentFile();
+		parent.mkdirs();
+		return super.createNewFile();
 	}
 }

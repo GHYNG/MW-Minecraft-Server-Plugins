@@ -1,6 +1,8 @@
 package org.mwage.mcPlugin.main.standard.logger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
+import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
 /**
  * 这个类的每一个对象表示在log文件中的每一行。
  * 每一行记录都由两个部分组成：时间和内容。
@@ -9,18 +11,22 @@ import java.util.Date;
  * @param <C>
  *            记录的内容的类型。
  */
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 public class LogLine<C> implements Comparable<LogLine<C>> {
 	/**
 	 * 默认使用的时间格式。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	protected SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
 	/**
 	 * 本行记录的时间。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public final Date DATE;
 	/**
 	 * 本行记录的内容。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public final C CONTENT;
 	/**
 	 * 根据给定的日期和内容，新建一条记录。
@@ -32,6 +38,7 @@ public class LogLine<C> implements Comparable<LogLine<C>> {
 	 * @deprecated 不应该在旧的记录中再插入记录。
 	 */
 	@Deprecated
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public LogLine(Date date, C content) {
 		DATE = date;
 		CONTENT = content;
@@ -42,6 +49,7 @@ public class LogLine<C> implements Comparable<LogLine<C>> {
 	 * @param content
 	 *            给定的内容。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public LogLine(C content) {
 		DATE = new Date();
 		CONTENT = content;
@@ -55,6 +63,7 @@ public class LogLine<C> implements Comparable<LogLine<C>> {
 	 * 
 	 * @return 本行记录的内容。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public String parseContent() {
 		return CONTENT.toString();
 	}
@@ -71,6 +80,7 @@ public class LogLine<C> implements Comparable<LogLine<C>> {
 	 * <p>
 	 * 除非使用了另外的时间格式。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public final String toString() {
 		return timeFormatter.format(DATE) + ": " + parseContent();
 	}
@@ -81,6 +91,7 @@ public class LogLine<C> implements Comparable<LogLine<C>> {
 	 * @see java.util.Date
 	 */
 	@Override
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public int compareTo(LogLine<C> o) {
 		return DATE.compareTo(o.DATE);
 	}

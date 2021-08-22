@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
+import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
 /**
  * 一个集中管理所有玩家设定的类。
@@ -16,15 +18,20 @@ import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
  * @author GHYNG
  * @param <S>
  *            储存单个玩家设定的类
+ * @deprecated 需要用更好的名称重命名。
  */
+@Deprecated
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	/**
 	 * The plugin which uses this settings.
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	private final MWPlugin plugin;
 	/**
 	 * Settings are stored into a hash map.
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	private Map<UUID, S> SETTINGS = new HashMap<UUID, S>();
 	/**
 	 * 产生一个新的管理所有在线玩家设定的对象。
@@ -35,6 +42,7 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	 * @throws CreationBeforeEnabledException
 	 *             如果在插件enabled之前创建此对象，报错。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public MWPlayerSettings(MWPlugin plugin) throws CreationBeforeEnabledException {
 		if(!plugin.isEnabled()) {
 			throw new CreationBeforeEnabledException("PlayerSettings class must be created after plugin object is enabled.");
@@ -49,6 +57,7 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	 * @param player
 	 *            指定的玩家。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public void readyPlayer(Player player) {
 		UUID uuid = player.getUniqueId();
 		S setting = SETTINGS.get(uuid);
@@ -60,6 +69,7 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	/**
 	 * 准备好所有玩家的设定。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public void readyPlayers() {
 		Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
 		for(Player player : onlinePlayers) {
@@ -73,6 +83,7 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	 *            指定玩家。
 	 * @return 玩家设定。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public S get(Player player) {
 		readyPlayer(player);
 		return SETTINGS.get(player.getUniqueId());
@@ -84,6 +95,7 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	 *            玩家的uuid。
 	 * @return 玩家设定。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public S get(UUID uuid) {
 		return SETTINGS.get(uuid);
 	}
@@ -94,6 +106,7 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	 *            指定玩家。
 	 * @return 玩家的一个新的设定。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public abstract S generatePlayerSetting(Player player);
 	/**
 	 * 初始化玩家设定。
@@ -102,8 +115,10 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	 *            指定玩家的uuid。
 	 * @return 玩家的一个新的设定。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public abstract S generatePlayerSetting(UUID uuid);
 }
+@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0, openToSubPlugin = false))
 class SettingListener implements Listener {
 	final MWPlayerSettings<?> settings;
 	SettingListener(MWPlayerSettings<?> settings) {
