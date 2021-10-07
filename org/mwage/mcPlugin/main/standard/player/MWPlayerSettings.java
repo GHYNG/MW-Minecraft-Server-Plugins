@@ -118,7 +118,16 @@ public abstract class MWPlayerSettings<S extends MWPlayerSetting> {
 	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0))
 	public abstract S generatePlayerSetting(UUID uuid);
 }
+/**
+ * 设定监听器。
+ * 已经过时。
+ * 该类名未来可能被重复使用。
+ * 
+ * @author GHYNG
+ * @deprecated 不再使用，未来会被替代。
+ */
 @MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 0, openToSubPlugin = false))
+@Deprecated
 class SettingListener implements Listener {
 	final MWPlayerSettings<?> settings;
 	SettingListener(MWPlayerSettings<?> settings) {

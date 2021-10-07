@@ -1,7 +1,6 @@
 package org.mwage.mcPlugin.main.standard.plugin.config;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.mwage.mcPlugin.main.Main_GeneralMethods;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
-public class MWPluginConfiguration implements Main_GeneralMethods {
+public class MWPluginConfigurationManager implements Main_GeneralMethods {
 	protected final Set<String> keywords = new HashSet<String>();
 	protected final MWPlugin plugin;
 	protected MemoryConfiguration localConfigGeneral = new MemoryConfiguration();
@@ -24,10 +23,13 @@ public class MWPluginConfiguration implements Main_GeneralMethods {
 	{
 		keywords.add("this");
 	}
-	public MWPluginConfiguration(MWPlugin plugin) {
+	public MWPluginConfigurationManager(MWPlugin plugin) {
 		this.plugin = plugin;
 	}
 	public void reload() {
+		readFilesIntoConfig();
+	}
+	private void readFilesIntoConfig() {
 		plugin.generatePluginFolder();
 		File folderConfigGeneral = plugin.getConfigsGeneralFolder(true);
 		File folderConfigGeneralForce = plugin.getConfigsGeneralForceFolder(true);
@@ -37,13 +39,13 @@ public class MWPluginConfiguration implements Main_GeneralMethods {
 		int numberParents = parentPlugins.size();
 		for(int i = 0; i < numberParents; i++) {
 			MWPlugin parentPlugin = parentPlugins.get(i);
-			MWPluginConfiguration parentConfig = parentPlugin.getMWConfig();
+			MWPluginConfigurationManager parentConfig = parentPlugin.getMWConfig();
 			MemoryConfiguration parentOverallConfigGeneral = parentConfig.overallConfigGeneral;
 			combineConfigs(overallConfigGeneral, parentOverallConfigGeneral);
 		}
 		for(int i = numberParents - 1; i >= 0; i--) {
 			MWPlugin parentPlugin = parentPlugins.get(i);
-			MWPluginConfiguration parentConfig = parentPlugin.getMWConfig();
+			MWPluginConfigurationManager parentConfig = parentPlugin.getMWConfig();
 			MemoryConfiguration parentOverallConfigGeneralForce = parentConfig.overallConfigGeneralForce;
 			combineConfigs(overallConfigGeneralForce, parentOverallConfigGeneralForce);
 		}
@@ -95,7 +97,7 @@ public class MWPluginConfiguration implements Main_GeneralMethods {
 					continue loop1;
 				}
 				String key = parts[0], orderTag = parts[1];
-				if(and(goodIdentifier(key, keywords), goodIdentifier(orderTag, keywords))) {
+				if(and(goodIdentifier(key, keywords), orderTag.startsWith("#"), goodIdentifier(orderTag.substring(1)))) {
 					MemoryConfiguration subConfig = parseConfigFromFile(subFile);
 					configAddSubConfig(config, key, subConfig);
 				}
@@ -133,7 +135,8 @@ public class MWPluginConfiguration implements Main_GeneralMethods {
 				if(
 					and(
 						goodIdentifier(key, keywords), 
-						goodIdentifier(orderTag, keywords), 
+						orderTag.startsWith("#"),
+						goodIdentifier(orderTag.substring(1)),
 						extendName.equals("yml")
 					)
 				)
@@ -163,106 +166,86 @@ public class MWPluginConfiguration implements Main_GeneralMethods {
 					configAddSubConfig(config, key, subConfig);
 				}
 			}
-			return config;
 			/*
-			 * Loop 5
+			 * Loop 5:
 			 * look for folders named "this.#orderTag"
 			 */
-			
-		}
-	}
-	protected MemoryConfiguration parseConfig(File file) {
-		String name = file.getName();
-		if(file.isFile()) {
-			if(name.endsWith("yml")) {
-				FileConfiguration config = new YamlConfiguration();
-				try {
-					config.load(file);
+			loop5 : for(File subFile : subFiles) {
+				if(subFile.isFile()) {
+					continue loop5;
 				}
-				catch(IOException | InvalidConfigurationException e) {
-					e.printStackTrace();
-					return null;
+				String subName = subFile.getName();
+				String[] parts = subName.split(".");
+				int numParts = parts.length;
+				if(numParts != 2) {
+					continue loop5;
 				}
-				return config;
-			}
-			else return null;
-		}
-		else {
-			FileConfiguration localGeneralConfig = new YamlConfiguration();
-			List<File> subFiles = arrayToList(file.listFiles());
-			Collections.sort(subFiles);
-			/*
-			 * Loop 1: look for "this.yml" files in folder "file"
-			 */
-			loop1 : for(File subFile : subFiles) {
-				String subFileName = subFile.getName();
-				if(subFileName.equals("this.yml")) {
-					configParseWithFile(localGeneralConfig, subFile);
-					break loop1;
+				String key = parts[0], orderTag = parts[1];
+				if(and(key.equals("this"), orderTag.startsWith("#"), goodIdentifier(orderTag.substring(1)))) {
+					MemoryConfiguration subConfig = parseConfigFromFile(subFile);
+					combineConfigs(config, subConfig);
 				}
 			}
 			/*
-			 * Loop 2: look for "this.*.yml" files in folder "file"
-			 * "*" must be good java identifier (but reserved names ok)
+			 * Loop 6:
+			 * look for folder named "this"
 			 */
-			loop2 : for(File subFile : subFiles) {
-				String subFileName = subFile.getName();
+			loop6 : for(File subFile : subFiles) {
+				if(subFile.isFile()) {
+					continue loop6;
+				}
+				String subName = subFile.getName();
+				if(subName.equals("this")) {
+					MemoryConfiguration subConfig = parseConfigFromFile(subFile);
+					combineConfigs(config, subConfig);
+				}
+			}
+			/*
+			 * Loop 7:
+			 * look for files named "this.#<orderTag>.yml"
+			 */
+			loop7 : for(File subFile : subFiles) {
+				if(!subFile.isFile()) {
+					continue loop7;
+				}
+				String subName = subFile.getName();
+				String[] parts = subName.split(".");
+				int numParts = parts.length;
+				if(numParts != 3) {
+					continue loop7;
+				}
+				String key = parts[0], orderTag = parts[1], extendName = parts[2];
 				/*@formatter:off*/
-				if (
-					and (
-						not (
-							subFileName.equals("this.yml")
-						), 
-						subFileName.startsWith("this."), 
-						subFileName.endsWith(".yml")
+				if(
+					and(
+						key.equals("this"), 
+						orderTag.startsWith("#"), 
+						goodIdentifier(orderTag.substring(1)),
+						extendName.equals("yml")
 					)
-				)
+				) 
 				/*@formatter:on*/
 				{
-					String[] parts = subFileName.split(".");
-					for(String part : parts) {
-						if(!goodIdentifier(part)) {
-							continue loop2;
-						}
-					}
-					configParseWithFile(localGeneralConfig, subFile);
+					MemoryConfiguration subConfig = parseConfigFromFile(subFile);
+					combineConfigs(config, subConfig);
 				}
 			}
 			/*
-			 * Loop 3: look for all "*.yml" files in folder "file"
-			 * "*" must be good java identifier (but reserved names ok)
+			 * Loop 8:
+			 * look for file named "this"
 			 */
-			loop3 : for(File subFile : subFiles) {
-				String subFileName = subFile.getName();
-				if(!subFileName.endsWith(".yml")) {
-					continue loop3;
+			loop8 : for(File subFile : subFiles) {
+				if(!subFile.isFile()) {
+					continue loop8;
 				}
-				String key = subFileName.substring(0, subFileName.length() - 4);
-				if(!goodIdentifier(key)) {
-					continue loop3;
+				String subName = subFile.getName();
+				if(subName.equals("this.yml")) {
+					MemoryConfiguration subConfig = parseConfigFromFile(subFile);
+					combineConfigs(config, subConfig);
 				}
-				else if(key.equals("this")) {
-					continue loop3;
-				}
-				FileConfiguration subConfig = new YamlConfiguration();
-				try {
-					subConfig.load(subFile);
-				}
-				catch(IOException | InvalidConfigurationException e) {
-					e.printStackTrace();
-					continue loop3;
-				}
-				localGeneralConfig.createSection(key, subConfig.getValues(true));
 			}
+			return config;
 		}
-		return null;
-	}
-	private void configParseWithFile(MemoryConfiguration config, File file) {
-		MemoryConfiguration thisConfig = parseConfig(file);
-		if(thisConfig == null) {
-			return;
-		}
-		combineConfigs(config, thisConfig);
 	}
 	private void combineConfigs(MemoryConfiguration base, MemoryConfiguration adder) {
 		Map<String, Object> values = adder.getValues(true);

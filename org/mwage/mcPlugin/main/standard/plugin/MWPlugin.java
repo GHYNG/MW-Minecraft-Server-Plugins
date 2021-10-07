@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
 import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
 import org.mwage.mcPlugin.main.standard.logger.Logger;
-import org.mwage.mcPlugin.main.standard.plugin.config.MWPluginConfiguration;
+import org.mwage.mcPlugin.main.standard.plugin.config.MWPluginConfigurationManager;
 import org.mwage.mcPlugin.main.util.UtilCollection;
 /**
  * 奶路标准插件类。
@@ -66,7 +66,7 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 * 本奶路插件的配置文件系统。
 	 */
 	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
-	protected final MWPluginConfiguration config = new MWPluginConfiguration(this);
+	protected final MWPluginConfigurationManager config = new MWPluginConfigurationManager(this);
 	/**
 	 * 将指定的，插件包中的文件，写入插件文件夹中。
 	 * <p>
@@ -356,7 +356,7 @@ public abstract class MWPlugin extends JavaPlugin implements UtilCollection {
 	 * @return 管理配置的类的对象。
 	 */
 	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
-	public MWPluginConfiguration getMWConfig() {
+	public MWPluginConfigurationManager getMWConfig() {
 		return config;
 	}
 }
