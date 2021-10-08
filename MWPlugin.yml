@@ -6,3 +6,5 @@
 # Wrong api-version will result in disfunction in many MW Plugins.
 # Note: This api-version is different from plugin-version provided in plugin.yml.
 mw-api-version: '1'
+
+# Github Test
