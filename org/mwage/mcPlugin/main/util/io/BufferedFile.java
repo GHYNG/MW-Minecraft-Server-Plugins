@@ -62,12 +62,14 @@ public class BufferedFile extends File {
 	 * 
 	 * @return 缓存区内容。
 	 */
-	public List<Object> getLines() {
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	public List<Object> lines() {
 		return lines;
 	}
 	/**
 	 * 将文件中的内容读入缓存区。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public void read() {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(this));
@@ -86,6 +88,7 @@ public class BufferedFile extends File {
 	/**
 	 * 将缓存区中的内容写入文件。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	public void write() {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(this));
@@ -103,6 +106,7 @@ public class BufferedFile extends File {
 	 * 在产生这个文件前，确保所有上级文件夹已经产生。
 	 * 如果没有产生，则先产生上级文件夹。
 	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	@Override
 	public boolean createNewFile() throws IOException {
 		File parent = getParentFile();

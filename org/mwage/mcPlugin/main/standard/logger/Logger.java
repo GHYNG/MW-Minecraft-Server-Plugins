@@ -119,7 +119,7 @@ public class Logger {
 			}
 			BufferedFile bf = new BufferedFile(file);
 			bf.read();
-			List<Object> filelines = bf.getLines();
+			List<Object> filelines = bf.lines();
 			List<LogLine<?>> lines = files.get(fileName);
 			for(LogLine<?> line : lines) {
 				filelines.add(line);
