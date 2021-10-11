@@ -1,5 +1,5 @@
 name: MW_Block_Protection
-version: Paper-1.16.5-MW-1.1
+version: Paper-1.16.5-MW-1.2
 description: This plugin protects blocks from different entities, including players, from illegal ways to break them.
 author: GHYNG
 main: org.mwage.mcPlugin.block_protection.Main
