@@ -42,8 +42,7 @@ public interface ExpressiveTableValue<A> extends Value<Map<String, Value<?, ?>>,
 		return defaultValue;
 	}
 	public default IntValue getInt(String key) {
-		// return getInt(key, new NullIntValueInstance());
-		return null; // TODO unfinished
+		return getInt(key, new NullIntValueInstance(null));
 	}
 	public default IntValue getInt(String key, IntValue defaultValue) {
 		Value<?, ?> value = get(key);

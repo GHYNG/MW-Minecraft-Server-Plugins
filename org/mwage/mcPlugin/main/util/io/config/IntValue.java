@@ -4,7 +4,7 @@ import java.util.Set;
 @MetaParsable
 public interface IntValue extends ActualIntValue<Integer>, ExpressiveIntValue<Integer> {
 	public static final IntValue VALUE_DEFAULT = new IntValueInstance(0);
-	public static final NullIntValue VALUE_NULL = new NullIntValueInstance();
+	public static final NullIntValue VALUE_NULL = new NullIntValueInstance(null);
 	@Override
 	public default IntValue getValue(Integer i) {
 		return parseValueFromString("" + i);
