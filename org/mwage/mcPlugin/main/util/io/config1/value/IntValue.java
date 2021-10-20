@@ -8,14 +8,14 @@ public interface IntValue extends ExpressiveIntValue<Integer>, ActualIntValue<In
 	}
 }
 class IntValueInstance implements IntValue {
-	protected final CollectionValue<?, ?> outerValue;
+	protected final CollectionValue<?, ?, ?> outerValue;
 	int value = 0;
-	IntValueInstance(CollectionValue<?, ?> outerValue, int value) {
+	IntValueInstance(CollectionValue<?, ?, ?> outerValue, int value) {
 		this.outerValue = outerValue;
 		this.value = value;
 	}
 	@Override
-	public CollectionValue<?, ?> getOuterValue() {
+	public CollectionValue<?, ?, ?> getOuterValue() {
 		return outerValue;
 	}
 	@Override
@@ -39,11 +39,13 @@ class IntValueInstance implements IntValue {
 		if(this == another) {
 			return true;
 		}
-		if(another instanceof IntValue anotherValue) {
-			if(another instanceof ErrorValue) {
-				return false;
-			}
-			return getCalculatableInstance().equals(anotherValue.getCalculatableInstance());
+		if(this instanceof ErrorValue<?, ?> me && another instanceof ErrorValue<?, ?> err) {
+			return(getTypeName().equals(err.getTypeName()) && me.getErrorReason().equals(err.getErrorReason()) && me.getOriginalContent().equals(err.getOriginalContent()));
+		}
+		if(another instanceof IntValue i) {
+			int x = getCalculatableInstance();
+			int y = i.getCalculatableInstance();
+			return x == y;
 		}
 		return false;
 	}

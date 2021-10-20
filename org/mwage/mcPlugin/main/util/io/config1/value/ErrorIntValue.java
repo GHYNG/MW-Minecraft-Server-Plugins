@@ -3,7 +3,7 @@ public interface ErrorIntValue extends IntValue, ErrorValue<Integer, Integer> {}
 class ErrorIntValueInstance extends IntValueInstance implements ErrorIntValue {
 	protected String errorReason = "";
 	protected String originalContent = "";
-	ErrorIntValueInstance(CollectionValue<?, ?> outerValue, String errorReason, String originalContent) {
+	ErrorIntValueInstance(CollectionValue<?, ?, ?> outerValue, String errorReason, String originalContent) {
 		super(outerValue, 0);
 		this.errorReason = errorReason;
 		this.originalContent = originalContent;

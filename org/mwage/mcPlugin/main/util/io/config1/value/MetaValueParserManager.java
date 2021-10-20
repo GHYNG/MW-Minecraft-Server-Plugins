@@ -22,7 +22,7 @@ public class MetaValueParserManager {
 	@SuppressWarnings({
 			"rawtypes", "unchecked"
 	})
-	public MetaValue<?, ?> parse(CollectionValue<?, ?> containingValue, String typeName, String content) {
+	public MetaValue<?, ?> parse(CollectionValue<?, ?, ?> containingValue, String typeName, String content) {
 		int size = parsers.size();
 		for(int i = size - 1; i >= 0; i--) {
 			MetaValueParser<?> parser = parsers.get(i);

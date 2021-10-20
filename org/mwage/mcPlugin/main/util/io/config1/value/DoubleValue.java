@@ -8,14 +8,14 @@ public interface DoubleValue extends ExpressiveDoubleValue<Double>, ActualDouble
 	}
 }
 class DoubleValueInstance implements DoubleValue {
-	protected final CollectionValue<?, ?> outerValue;
+	protected final CollectionValue<?, ?, ?> outerValue;
 	protected double value = 0;
-	DoubleValueInstance(CollectionValue<?, ?> outerValue, double value) {
+	DoubleValueInstance(CollectionValue<?, ?, ?> outerValue, double value) {
 		this.outerValue = outerValue;
 		this.value = value;
 	}
 	@Override
-	public CollectionValue<?, ?> getOuterValue() {
+	public CollectionValue<?, ?, ?> getOuterValue() {
 		return outerValue;
 	}
 	@Override
@@ -33,5 +33,24 @@ class DoubleValueInstance implements DoubleValue {
 	@Override
 	public String toContent() {
 		return "" + value;
+	}
+	@Override
+	public String toString() {
+		return toContent();
+	}
+	@Override
+	public boolean equals(Object another) {
+		if(this == another) {
+			return true;
+		}
+		if(this instanceof ErrorValue<?, ?> me && another instanceof ErrorValue<?, ?> err) {
+			return(getTypeName().equals(err.getTypeName()) && me.getErrorReason().equals(err.getErrorReason()) && me.getOriginalContent().equals(err.getOriginalContent()));
+		}
+		if(another instanceof DoubleValue d) {
+			double x = getCalculatableInstance();
+			double y = d.getCalculatableInstance();
+			return x == y;
+		}
+		return false;
 	}
 }
