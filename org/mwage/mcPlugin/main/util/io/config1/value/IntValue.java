@@ -8,9 +8,15 @@ public interface IntValue extends ExpressiveIntValue<Integer>, ActualIntValue<In
 	}
 }
 class IntValueInstance implements IntValue {
+	protected final CollectionValue<?, ?> outerValue;
 	int value = 0;
-	IntValueInstance(int value) {
+	IntValueInstance(CollectionValue<?, ?> outerValue, int value) {
+		this.outerValue = outerValue;
 		this.value = value;
+	}
+	@Override
+	public CollectionValue<?, ?> getOuterValue() {
+		return outerValue;
 	}
 	@Override
 	public String getTypeName() {

@@ -14,16 +14,16 @@ public class IntValueParser extends MetaValueParser<IntValue> {
 		return true;
 	}
 	@Override
-	public IntValue parse(String content) {
+	public IntValue parse(final CollectionValue<?, ?> outerValue, String content) {
 		try {
 			int v = Integer.parseInt(content);
-			return new IntValueInstance(v);
+			return new IntValueInstance(outerValue, v);
 		}
 		catch(Exception e) {
-			return new ErrorIntValueInstance("Unable to parse int value with any parser: ", content);
+			return new ErrorIntValueInstance(outerValue, "Unable to parse int value with any parser: ", content);
 		}
 	}
-	public IntValue generate(int v) {
-		return new IntValueInstance(v);
+	public IntValue generate(final CollectionValue<?, ?> outerValue, int v) {
+		return new IntValueInstance(outerValue, v);
 	}
 }

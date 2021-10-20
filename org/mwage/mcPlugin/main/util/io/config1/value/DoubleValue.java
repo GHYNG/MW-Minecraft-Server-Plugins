@@ -8,29 +8,30 @@ public interface DoubleValue extends ExpressiveDoubleValue<Double>, ActualDouble
 	}
 }
 class DoubleValueInstance implements DoubleValue {
+	protected final CollectionValue<?, ?> outerValue;
 	protected double value = 0;
-	DoubleValueInstance(double value) {
+	DoubleValueInstance(CollectionValue<?, ?> outerValue, double value) {
+		this.outerValue = outerValue;
 		this.value = value;
+	}
+	@Override
+	public CollectionValue<?, ?> getOuterValue() {
+		return outerValue;
 	}
 	@Override
 	public String getTypeName() {
 		return StaticData.DOUBLE_TYPE_NAME;
 	}
-
 	@Override
 	public Double getExpressiveInstance() {
 		return value;
 	}
-
 	@Override
 	public Double getActualInstance() {
 		return value;
 	}
-
 	@Override
 	public String toContent() {
 		return "" + value;
 	}
-	
-	
 }

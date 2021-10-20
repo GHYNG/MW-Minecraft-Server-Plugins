@@ -19,16 +19,18 @@ public class MetaValueParserManager {
 		}
 		return false;
 	}
-	@SuppressWarnings("rawtypes")
-	public MetaValue<?, ?> parse(String typeName, String content) {
+	@SuppressWarnings({
+			"rawtypes", "unchecked"
+	})
+	public MetaValue<?, ?> parse(CollectionValue<?, ?> containingValue, String typeName, String content) {
 		int size = parsers.size();
 		for(int i = size - 1; i >= 0; i--) {
 			MetaValueParser<?> parser = parsers.get(i);
 			if(parser.typeName.equals(typeName) && parser.parsable(content)) {
-				MetaValue<?, ?> value = parser.parse(content);
+				MetaValue<?, ?> value = parser.parse(containingValue, content);
 				return value;
 			}
 		}
-		return new ErrorMetaValueInstance(typeName, "Unable to parse value with any parser: ", content);
+		return new ErrorMetaValueInstance(containingValue, typeName, "Unable to parse value with any parser: ", content);
 	}
 }
