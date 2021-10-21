@@ -3,7 +3,7 @@ public interface ErrorDoubleValue extends DoubleValue, ErrorMetaValue<Double, Do
 class ErrorDoubleValueInstance extends DoubleValueInstance implements ErrorDoubleValue {
 	protected String errorReason;
 	protected String originalContent;
-	ErrorDoubleValueInstance(CollectionValue<?, ?, ?> outerValue, String errorReason, String originalContent) {
+	ErrorDoubleValueInstance(CollectionValue<?, ?, ?, ?, ?> outerValue, String errorReason, String originalContent) {
 		super(outerValue, 0);
 		this.errorReason = errorReason;
 		this.originalContent = originalContent;

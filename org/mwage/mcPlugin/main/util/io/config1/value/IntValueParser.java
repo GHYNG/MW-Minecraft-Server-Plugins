@@ -14,7 +14,7 @@ public class IntValueParser extends MetaValueParser<IntValue> {
 		return true;
 	}
 	@Override
-	public IntValue parse(final CollectionValue<?, ?, ?> outerValue, String content) {
+	public IntValue parse(final CollectionValue<?, ?, ?, ?, ?> outerValue, String content) {
 		try {
 			int v = Integer.parseInt(content);
 			return new IntValueInstance(outerValue, v);
@@ -23,7 +23,7 @@ public class IntValueParser extends MetaValueParser<IntValue> {
 			return new ErrorIntValueInstance(outerValue, "Unable to parse int value with any parser: ", content);
 		}
 	}
-	public IntValue generate(final CollectionValue<?, ?, ?> outerValue, int v) {
+	public IntValue generate(final CollectionValue<?, ?, ?, ?, ?> outerValue, int v) {
 		return new IntValueInstance(outerValue, v);
 	}
 }

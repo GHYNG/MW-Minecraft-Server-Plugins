@@ -8,14 +8,14 @@ public interface DoubleValue extends ExpressiveDoubleValue<Double>, ActualDouble
 	}
 }
 class DoubleValueInstance implements DoubleValue {
-	protected final CollectionValue<?, ?, ?> outerValue;
+	protected final CollectionValue<?, ?, ?, ?, ?> outerValue;
 	protected double value = 0;
-	DoubleValueInstance(CollectionValue<?, ?, ?> outerValue, double value) {
+	DoubleValueInstance(CollectionValue<?, ?, ?, ?, ?> outerValue, double value) {
 		this.outerValue = outerValue;
 		this.value = value;
 	}
 	@Override
-	public CollectionValue<?, ?, ?> getOuterValue() {
+	public CollectionValue<?, ?, ?, ?, ?> getOuterValue() {
 		return outerValue;
 	}
 	@Override

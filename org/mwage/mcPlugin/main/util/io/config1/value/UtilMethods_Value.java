@@ -1,7 +1,7 @@
-package org.mwage.mcPlugin.main.util.methods;
+package org.mwage.mcPlugin.main.util.io.config1.value;
 import java.util.HashSet;
 import java.util.Set;
-public interface ClassUtil {
+interface UtilMethods_Value {
 	default boolean aSuperb(Class<?> a, Class<?> b) {
 		if(a == null || b == null) {
 			return false;
@@ -11,9 +11,6 @@ public interface ClassUtil {
 		}
 		Set<Class<?>> bSuperClasses = getAllSuperClasses(b);
 		return bSuperClasses.contains(a);
-	}
-	default boolean aSubb(Class<?> a, Class<?> b) {
-		return aSuperb(b, a);
 	}
 	default Set<Class<?>> getAllSuperClasses(Class<?> clazz) {
 		if(clazz == null) {

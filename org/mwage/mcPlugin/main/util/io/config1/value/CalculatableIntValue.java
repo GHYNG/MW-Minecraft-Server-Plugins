@@ -1,6 +1,10 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
 public interface CalculatableIntValue<E, A> extends CalculatableValue<Integer, E, A>, Comparable<CalculatableIntValue<E, A>> {
 	@Override
+	default Class<Integer> getClassC() {
+		return Integer.class;
+	}
+	@Override
 	default int compareTo(CalculatableIntValue<E, A> another) {
 		if(another == null) {
 			return 0;

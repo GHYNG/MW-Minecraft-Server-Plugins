@@ -10,18 +10,26 @@ public interface ErrorValue<E, A> extends Value<E, A> {
  * All normal methods from Value in ErrorValueInstances should return null.
  */
 class ErrorValueInstance<E, A> implements ErrorValue<E, A> {
-	protected final CollectionValue<?, ?, ?> outerValue;
+	protected final CollectionValue<?, ?, ?, ?, ?> outerValue;
 	protected String typeName = "";
 	protected String originalContent = "";
 	protected String errorReason = "";
-	ErrorValueInstance(CollectionValue<?, ?, ?> outerValue, String typeName, String originalContent, String errorReason) {
+	ErrorValueInstance(CollectionValue<?, ?, ?, ?, ?> outerValue, String typeName, String originalContent, String errorReason) {
 		this.outerValue = outerValue;
 		this.typeName = typeName;
 		this.originalContent = originalContent;
 		this.errorReason = errorReason;
 	}
 	@Override
-	public CollectionValue<?, ?, ?> getOuterValue() {
+	public Class<E> getClassE() {
+		return null; // return null
+	}
+	@Override
+	public Class<A> getClassA() {
+		return null; // return null
+	}
+	@Override
+	public CollectionValue<?, ?, ?, ?, ?> getOuterValue() {
 		return outerValue;
 	}
 	@Override

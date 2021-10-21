@@ -14,7 +14,7 @@ public class DoubleValueParser extends MetaValueParser<DoubleValue> {
 		return true;
 	}
 	@Override
-	public DoubleValue parse(CollectionValue<?, ?, ?> outerValue, String content) {
+	public DoubleValue parse(CollectionValue<?, ?, ?, ?, ?> outerValue, String content) {
 		try {
 			double v = Double.parseDouble(content);
 			return new DoubleValueInstance(outerValue, v);
