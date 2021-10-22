@@ -15,15 +15,25 @@ public class GenericTypesInfo<T> implements ClassUtil {
 			}
 			return false;
 		}
+		@Override
+		public String toString() {
+			return clazz.toString() + "<" + genericTypeParamaterName + ">";
+		}
 	}
-	protected final Class<T> clazz;
+	public final Class<T> clazz;
 	protected final Map<Node, Class<?>> genericTypes = new HashMap<Node, Class<?>>();
 	public GenericTypesInfo(Class<T> clazz) {
 		this.clazz = clazz;
 	}
 	public GenericTypesInfo(Class<T> clazz, Map<Node, Class<?>> genericTypes) {
 		this(clazz);
-		this.genericTypes.putAll(genericTypes);
+		genericTypes.keySet().forEach(node -> {
+			Class<?> superClass = node.clazz;
+			System.out.println(superClass.getName());
+			if(aSuperb(superClass, clazz)) {
+				this.genericTypes.put(node, genericTypes.get(node));
+			}
+		});
 	}
 	public Class<?> get(Class<?> clazz, String genericTypeParamaterName) {
 		Node node = new Node(clazz, genericTypeParamaterName);
@@ -91,5 +101,9 @@ public class GenericTypesInfo<T> implements ClassUtil {
 			return genericTypes.equals(another.genericTypes);
 		}
 		return false;
+	}
+	@Override
+	public String toString() {
+		return clazz.getName() + ": " + genericTypes.toString();
 	}
 }
