@@ -1,4 +1,6 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
+import org.mwage.mcPlugin.main.util.clazz.GenericTypeHeader;
+@GenericTypeHeader(superClass = CalculatableValue.class, typeParamaterName = "C", typeParamater = Double.class)
 public interface CalculatableDoubleValue<E, A> extends CalculatableValue<Double, E, A>, Comparable<CalculatableDoubleValue<E, A>> {
 	@Override
 	default Class<Double> getClassC() {

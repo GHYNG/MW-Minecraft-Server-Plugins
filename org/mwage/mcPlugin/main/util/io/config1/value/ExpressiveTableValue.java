@@ -1,6 +1,9 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
 import java.util.HashMap;
 import java.util.Map;
+import org.mwage.mcPlugin.main.util.clazz.GenericTypeHeader;
+import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfo;
+@GenericTypeHeader(superClass = Value.class, typeParamaterName = "E", typeParamater = Map.class)
 public interface ExpressiveTableValue<A, SE, SA, S extends Value<SE, SA>> extends CollectionValue<Map<String, S>, A, SE, SA, S> {
 	@SuppressWarnings("unchecked")
 	@Override
@@ -13,11 +16,37 @@ public interface ExpressiveTableValue<A, SE, SA, S extends Value<SE, SA>> extend
 		return map.get(key);
 	}
 	default IntValue getInnerIntValue(String key) {
-		// TODO this method is wrong, needs to be rewritten
-		S value = getInnerValue(key);
-		if(getClassS().isInstance(value)) {
-			return (IntValue)value;
+		GenericTypesInfo<S> storedValueGenericTypesInfo = getStoredValueGenericTypesInfo();
+		if(storedValueGenericTypesInfo.isSuperTo(ExpressiveTableValueUtil.intValueGenericTypesInfo)) {
+			S value = getInnerValue(key);
+			if(value instanceof IntValue iv) {
+				return iv;
+			}
+			return null;
 		}
-		throw new WrongStorageTypeInCollectionValueException("IntValue is not allowed to store in this table.");
+		else {
+			throw new WrongStorageTypeInCollectionValueException("IntValue is not allowed to store in this table.");
+		}
+	}
+}
+@SuppressWarnings("unused")
+class ExpressiveTableValueUtil {
+	static GenericTypesInfo<IntValue> intValueGenericTypesInfo;
+	static GenericTypesInfo<DoubleValue> doubleValueGenericTypesInfo;
+	static {
+		IntValue : {
+			Map<GenericTypesInfo.Node, Class<?>> intValueGenericTypes = new HashMap<GenericTypesInfo.Node, Class<?>>();
+			intValueGenericTypes.put(new GenericTypesInfo.Node(Value.class, "E"), Integer.class);
+			intValueGenericTypes.put(new GenericTypesInfo.Node(Value.class, "A"), Integer.class);
+			intValueGenericTypes.put(new GenericTypesInfo.Node(CalculatableValue.class, "C"), Integer.class);
+			intValueGenericTypesInfo = new GenericTypesInfo<IntValue>(IntValue.class, intValueGenericTypes);
+		}
+		DoubleValue : {
+			Map<GenericTypesInfo.Node, Class<?>> intValueGenericTypes = new HashMap<GenericTypesInfo.Node, Class<?>>();
+			intValueGenericTypes.put(new GenericTypesInfo.Node(Value.class, "E"), Double.class);
+			intValueGenericTypes.put(new GenericTypesInfo.Node(Value.class, "A"), Double.class);
+			intValueGenericTypes.put(new GenericTypesInfo.Node(CalculatableValue.class, "C"), Double.class);
+			doubleValueGenericTypesInfo = new GenericTypesInfo<DoubleValue>(DoubleValue.class, intValueGenericTypes);
+		}
 	}
 }

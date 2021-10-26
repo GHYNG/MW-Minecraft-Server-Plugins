@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import org.mwage.mcPlugin.main.util.methods.ClassUtil;
 public class GenericTypesInfo<T> implements ClassUtil {
-	static record Node(Class<?> clazz, String genericTypeParamaterName) {
+	public static record Node(Class<?> clazz, String genericTypeParamaterName) {
 		@Override
 		public boolean equals(Object obj) {
 			if(this == obj) {
@@ -35,8 +35,8 @@ public class GenericTypesInfo<T> implements ClassUtil {
 			}
 		});
 	}
-	public Class<?> get(Class<?> clazz, String genericTypeParamaterName) {
-		Node node = new Node(clazz, genericTypeParamaterName);
+	public Class<?> get(Class<?> superClass, String typeParamaterName) {
+		Node node = new Node(superClass, typeParamaterName);
 		return genericTypes.get(node);
 	}
 	public Class<?> get(Node node) {

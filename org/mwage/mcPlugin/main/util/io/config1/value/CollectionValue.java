@@ -1,14 +1,27 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import org.mwage.mcPlugin.main.util.clazz.GenericTypeHeader;
+import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfo;
+@GenericTypeHeader(superClass = CollectionValue.class, typeParamaterName = "SE", typeParamater = Object.class)
+@GenericTypeHeader(superClass = CollectionValue.class, typeParamaterName = "SA", typeParamater = Object.class)
+@GenericTypeHeader(superClass = CollectionValue.class, typeParamaterName = "S", typeParamater = Value.class)
 public interface CollectionValue<E, A, SE, SA, S extends Value<SE, SA>> extends Value<E, A> {
 	Class<S> getClassS();
 	Class<SE> getClassSE();
 	Class<SA> getClassSA();
+	default GenericTypesInfo<S> getStoredValueGenericTypesInfo() {
+		Map<GenericTypesInfo.Node, Class<?>> map = new HashMap<GenericTypesInfo.Node, Class<?>>();
+		map.put(new GenericTypesInfo.Node(Value.class, "E"), Object.class);
+		map.put(new GenericTypesInfo.Node(Value.class, "A"), Object.class);
+		return new GenericTypesInfo<S>(getClassS(), map);
+	}
 	Set<S> getDirectlyInnerValues();
 	@SuppressWarnings("unchecked")
-	default Set<S> getAllInnerValues() {
+	default Set<S> getAllInnerValues() { // TODO needs rewrite
 		Set<S> values = new HashSet<S>();
 		getDirectlyInnerValues().forEach(value -> {
 			values.add(value);
@@ -26,7 +39,7 @@ public interface CollectionValue<E, A, SE, SA, S extends Value<SE, SA>> extends 
 	}
 	S getDirectlyInnerValue(String key);
 	@SuppressWarnings("unchecked")
-	default S getInnerValueWithKeyArray(String... keys) {
+	default S getInnerValueWithKeyArray(String... keys) { // TODO needs rewrite
 		if(keys == null) {
 			return null;
 		}
@@ -66,5 +79,11 @@ public interface CollectionValue<E, A, SE, SA, S extends Value<SE, SA>> extends 
 	default S getInnerValue(String key) {
 		String[] keys = key.split("\\.");
 		return getInnerValueWithKeyArray(keys);
+	}
+	default <V extends S> V getInnerValueWithGenericTypesInfo(String key, GenericTypesInfo<V> genericTypesInfo, V def) {
+		S value = getInnerValue(key);
+		GenericTypesInfo<?> valueGenericTypesInfo = value.getGenericTypesInfo();
+		if(genericTypesInfo.isSuperTo(valueGenericTypesInfo)) {}
+		return null; // TODO unfinished
 	}
 }
