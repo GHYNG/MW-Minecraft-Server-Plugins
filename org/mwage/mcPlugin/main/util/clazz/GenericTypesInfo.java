@@ -29,7 +29,6 @@ public class GenericTypesInfo<T> implements ClassUtil {
 		this(clazz);
 		genericTypes.keySet().forEach(node -> {
 			Class<?> superClass = node.clazz;
-			System.out.println(superClass.getName());
 			if(aSuperb(superClass, clazz)) {
 				this.genericTypes.put(node, genericTypes.get(node));
 			}

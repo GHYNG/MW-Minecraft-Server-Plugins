@@ -3,7 +3,7 @@ import org.mwage.mcPlugin.main.util.clazz.GenericTypeHeader;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfo;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfoble;
 @GenericTypeHeader(superClass = Value.class, typeParamaterName = "E", typeParamater = Object.class)
-@GenericTypeHeader(superClass = Value.class, typeParamaterName = "V", typeParamater = Object.class)
+@GenericTypeHeader(superClass = Value.class, typeParamaterName = "A", typeParamater = Object.class)
 @GenericTypeHeader(superClass = GenericTypesInfoble.class, typeParamaterName = "T", typeParamater = Value.class)
 public interface Value<E, A> extends GenericTypesInfoble<Value<E, A>> {
 	Class<E> getClassE();
@@ -11,8 +11,7 @@ public interface Value<E, A> extends GenericTypesInfoble<Value<E, A>> {
 	E getExpressiveInstance();
 	A getActualInstance();
 	default void prepareGenericTypesInfo(GenericTypesInfo<?> genericTypesInfo) throws PrepareWrongGenericTypesInfoException {
-		GenericTypesInfo<? extends Value<E, A>> myGenericTypesInfo = getGenericTypesInfo();
-		if(!myGenericTypesInfo.equals(genericTypesInfo)) {
+		if(getClass() != genericTypesInfo.clazz) {
 			throw new PrepareWrongGenericTypesInfoException("Only allow to prepare this value instance's own GenricTypesInfo instance.");
 		}
 		genericTypesInfo.put(Value.class, "E", getClassE());
@@ -29,8 +28,8 @@ public interface Value<E, A> extends GenericTypesInfoble<Value<E, A>> {
 		}
 		return info;
 	}
-	CollectionValue<?, ?, ?, ?, ?> getOuterValue();
-	default CollectionValue<?, ?, ?, ?, ?> getOutestValue() {
+	CollectionValue<?, ?, ?, ?, ? extends Value<?, ?>> getOuterValue();
+	default CollectionValue<?, ?, ?, ?, ? extends Value<?, ?>> getOutestValue() {
 		if(this instanceof CollectionValue<?, ?, ?, ?, ?> container) {
 			while(container.getOuterValue() != null) {
 				container = container.getOuterValue();

@@ -50,7 +50,7 @@ class GenericTypesInfobleUtil implements ClassUtil {
 			}
 		}
 		classUtil.getAllSuperClasses(clazz).forEach(superClass -> {
-			getGenericTypesOfClass(clazz, genericTypes);
+			getGenericTypesOfClass(superClass, genericTypes);
 		});
 		return genericTypes;
 	}

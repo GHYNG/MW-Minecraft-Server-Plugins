@@ -15,16 +15,15 @@ public interface ClassUtil {
 	default boolean aSubb(Class<?> a, Class<?> b) {
 		return aSuperb(b, a);
 	}
-	default Set<Class<?>> getAllSuperClasses(Class<?> clazz) {
+	default Set<Class<?>> getAllSuperClasses(final Class<?> clazz) {
 		if(clazz == null) {
 			return null;
 		}
 		Set<Class<?>> superClasses = new HashSet<Class<?>>();
-		Class<?> superClass = clazz;
-		superClasses.add(superClass);
-		while(superClass != Object.class) {
-			superClass = superClass.getSuperclass();
+		Class<?> superClass = clazz.getSuperclass();
+		while(superClass != null) {
 			superClasses.add(superClass);
+			superClass = superClass.getSuperclass();
 		}
 		superClasses.addAll(getAllSuperInterfaces(clazz));
 		return superClasses;
