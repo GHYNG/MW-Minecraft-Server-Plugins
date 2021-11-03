@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypeHeader;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfo;
+/*
+ * <S> The storage value type.
+ * <SE> The storage value's expressive instance type.
+ * <SA> The storage value's actual instance type.
+ */
 @GenericTypeHeader(superClass = CollectionValue.class, typeParamaterName = "SE", typeParamater = Object.class)
 @GenericTypeHeader(superClass = CollectionValue.class, typeParamaterName = "SA", typeParamater = Object.class)
 @GenericTypeHeader(superClass = CollectionValue.class, typeParamaterName = "S", typeParamater = Value.class)
@@ -15,11 +20,22 @@ public interface CollectionValue<E, A, SE, SA, S extends Value<SE, SA>> extends 
 	Class<SA> getClassSA();
 	default GenericTypesInfo<S> getStoredValueGenericTypesInfo() {
 		Map<GenericTypesInfo.Node, Class<?>> map = new HashMap<GenericTypesInfo.Node, Class<?>>();
-		map.put(new GenericTypesInfo.Node(Value.class, "E"), Object.class);
-		map.put(new GenericTypesInfo.Node(Value.class, "A"), Object.class);
+		map.put(new GenericTypesInfo.Node(Value.class, "E"), getClassSE());
+		map.put(new GenericTypesInfo.Node(Value.class, "A"), getClassSA());
 		return new GenericTypesInfo<S>(getClassS(), map);
 	}
 	Set<S> getDirectlyInnerValues();
+	default Set<S> getAllInnerValues1() {
+		Set<S> values = new HashSet<S>();
+		boolean containsCollectionValues = CollectionValueUtil.collectionValueGenericTypesInfo.isSuperTo(getStoredValueGenericTypesInfo());
+		getDirectlyInnerValues().forEach(value -> {
+			values.add(value);
+			if(containsCollectionValues && value instanceof CollectionValue<?, ?, ?, ?, ?> container) {
+				Set<? extends Value<?, ?>> subValues = container.getAllInnerValues1();
+			}
+		});
+		return null; // TODO unfinished
+	}
 	@SuppressWarnings("unchecked")
 	default Set<S> getAllInnerValues() { // TODO needs rewrite
 		Set<S> values = new HashSet<S>();
@@ -85,5 +101,20 @@ public interface CollectionValue<E, A, SE, SA, S extends Value<SE, SA>> extends 
 		GenericTypesInfo<?> valueGenericTypesInfo = value.getGenericTypesInfo();
 		if(genericTypesInfo.isSuperTo(valueGenericTypesInfo)) {}
 		return null; // TODO unfinished
+	}
+}
+@SuppressWarnings({
+		"unused", "rawtypes"
+})
+class CollectionValueUtil {
+	static GenericTypesInfo<CollectionValue> collectionValueGenericTypesInfo;
+	static {
+		CollectionValue : {
+			Map<GenericTypesInfo.Node, Class<?>> collectionValueGenericTypes = new HashMap<GenericTypesInfo.Node, Class<?>>();
+			collectionValueGenericTypes.put(new GenericTypesInfo.Node(CollectionValue.class, "SE"), Object.class);
+			collectionValueGenericTypes.put(new GenericTypesInfo.Node(CollectionValue.class, "SA"), Object.class);
+			collectionValueGenericTypes.put(new GenericTypesInfo.Node(CollectionValue.class, "S"), Value.class);
+			collectionValueGenericTypesInfo = new GenericTypesInfo<CollectionValue>(CollectionValue.class, collectionValueGenericTypes);
+		}
 	}
 }

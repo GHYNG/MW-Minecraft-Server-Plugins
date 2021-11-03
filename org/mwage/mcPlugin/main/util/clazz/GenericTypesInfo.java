@@ -4,20 +4,20 @@ import java.util.Map;
 import java.util.Set;
 import org.mwage.mcPlugin.main.util.methods.ClassUtil;
 public class GenericTypesInfo<T> implements ClassUtil {
-	public static record Node(Class<?> clazz, String genericTypeParamaterName) {
+	public static record Node(Class<?> clazz, String typeParamaterName) {
 		@Override
 		public boolean equals(Object obj) {
 			if(this == obj) {
 				return true;
 			}
 			if(obj instanceof Node another) {
-				return clazz == another.clazz && genericTypeParamaterName.equals(another.genericTypeParamaterName);
+				return clazz == another.clazz && typeParamaterName.equals(another.typeParamaterName);
 			}
 			return false;
 		}
 		@Override
 		public String toString() {
-			return clazz.toString() + "<" + genericTypeParamaterName + ">";
+			return clazz.toString() + "<" + typeParamaterName + ">";
 		}
 	}
 	public final Class<T> clazz;
@@ -41,6 +41,22 @@ public class GenericTypesInfo<T> implements ClassUtil {
 	}
 	public Class<?> get(Node node) {
 		return genericTypes.get(node);
+	}
+	public void put(Class<?> superClass, String typeParamaterName, Class<?> typeParamater) throws ClassDoesNotInheritException {
+		if(!aSuperb(superClass, clazz)) {
+			throw new ClassDoesNotInheritException("Cannot register type paramater in super class, because " + clazz + "does not extend " + superClass);
+		}
+		Node node = new Node(superClass, typeParamaterName);
+		Class<?> targetClass = genericTypes.get(node);
+		if(targetClass != null && !aSuperb(targetClass, typeParamater)) {
+			throw new ClassDoesNotInheritException("Cannot register type paramater in super class, because " + typeParamater + " does not extend existing mapped class: " + targetClass);
+		}
+		genericTypes.put(node, typeParamater);
+	}
+	public <TP> void put(Node node, Class<TP> typeParamater) {
+		Class<?> superClass = node.clazz;
+		String typeParamaterName = node.typeParamaterName;
+		put(superClass, typeParamaterName, typeParamater);
 	}
 	public boolean isSuperTo(GenericTypesInfo<?> another) {
 		if(another == null) {

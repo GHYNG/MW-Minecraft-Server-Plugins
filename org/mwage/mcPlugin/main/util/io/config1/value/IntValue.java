@@ -34,12 +34,13 @@ class IntValueInstance implements IntValue {
 	public String toContent() {
 		return "" + value;
 	}
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean equals(Object another) {
 		if(this == another) {
 			return true;
 		}
-		if(this instanceof ErrorValue<?, ?> me && another instanceof ErrorValue<?, ?> err) {
+		if(this instanceof ErrorValue me && another instanceof ErrorValue err) {
 			return(getTypeName().equals(err.getTypeName()) && me.getErrorReason().equals(err.getErrorReason()) && me.getOriginalContent().equals(err.getOriginalContent()));
 		}
 		if(another instanceof IntValue i) {
