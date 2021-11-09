@@ -41,11 +41,11 @@ class ErrorMetaValueInstance<E, A> implements ErrorMetaValue<E, A>, MetaValue<E,
 		return errorReason;
 	}
 	@Override
-	public E getExpressiveInstance() {
+	public E getInstanceE() {
 		return null; // return null
 	}
 	@Override
-	public A getActualInstance() {
+	public A getInstanceA() {
 		return null; // return null
 	}
 }

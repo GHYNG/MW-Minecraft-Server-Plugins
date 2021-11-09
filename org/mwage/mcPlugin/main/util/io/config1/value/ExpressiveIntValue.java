@@ -9,7 +9,7 @@ public interface ExpressiveIntValue<A> extends CalculatableIntValue<Integer, A>,
 		return Integer.class;
 	}
 	@Override
-	default Integer getCalculatableInstance() {
-		return getExpressiveInstance();
+	default Integer getInstanceC() {
+		return getInstanceE();
 	}
 }

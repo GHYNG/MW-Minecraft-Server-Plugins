@@ -14,8 +14,8 @@ public interface CalculatableIntValue<E, A> extends CalculatableValue<Integer, E
 		if(another instanceof ErrorValue) {
 			return 0;
 		}
-		int x = getCalculatableInstance();
-		int y = another.getCalculatableInstance();
+		int x = getInstanceC();
+		int y = another.getInstanceC();
 		return x == y ? 0 : x > y ? 1 : -1;
 	}
 }

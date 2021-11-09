@@ -7,7 +7,7 @@ public interface ActualIntValue<E> extends CalculatableIntValue<E, Integer> {
 		return Integer.class;
 	}
 	@Override
-	default Integer getCalculatableInstance() {
-		return getActualInstance();
+	default Integer getInstanceC() {
+		return getInstanceA();
 	}
 }

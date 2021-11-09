@@ -12,21 +12,8 @@ public interface ExpressiveTableValue<A, SE, SA, S extends Value<SE, SA>> extend
 	}
 	@Override
 	default S getDirectlyInnerValue(String key) {
-		Map<String, S> map = getExpressiveInstance();
+		Map<String, S> map = getInstanceE();
 		return map.get(key);
-	}
-	default IntValue getInnerIntValue(String key) {
-		GenericTypesInfo<S> storedValueGenericTypesInfo = getStoredValueGenericTypesInfo();
-		if(storedValueGenericTypesInfo.isSuperTo(ExpressiveTableValueUtil.intValueGenericTypesInfo)) {
-			S value = getInnerValue(key);
-			if(value instanceof IntValue iv) {
-				return iv;
-			}
-			return null;
-		}
-		else {
-			throw new WrongStorageTypeInCollectionValueException("IntValue is not allowed to store in this table.");
-		}
 	}
 }
 @SuppressWarnings("unused")

@@ -1,9 +1,9 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
 public interface IntValue extends ExpressiveIntValue<Integer>, ActualIntValue<Integer> {
 	@Override
-	default Integer getCalculatableInstance() {
-		Integer c1 = ExpressiveIntValue.super.getCalculatableInstance();
-		Integer c2 = ActualIntValue.super.getCalculatableInstance();
+	default Integer getInstanceC() {
+		Integer c1 = ExpressiveIntValue.super.getInstanceC();
+		Integer c2 = ActualIntValue.super.getInstanceC();
 		return c1 == c2 ? c1 : null;
 	}
 }
@@ -23,11 +23,11 @@ class IntValueInstance implements IntValue {
 		return StaticData.INT_TYPE_NAME;
 	}
 	@Override
-	public Integer getExpressiveInstance() {
+	public Integer getInstanceE() {
 		return value;
 	}
 	@Override
-	public Integer getActualInstance() {
+	public Integer getInstanceA() {
 		return value;
 	}
 	@Override
@@ -44,8 +44,8 @@ class IntValueInstance implements IntValue {
 			return(getTypeName().equals(err.getTypeName()) && me.getErrorReason().equals(err.getErrorReason()) && me.getOriginalContent().equals(err.getOriginalContent()));
 		}
 		if(another instanceof IntValue i) {
-			int x = getCalculatableInstance();
-			int y = i.getCalculatableInstance();
+			int x = getInstanceC();
+			int y = i.getInstanceC();
 			return x == y;
 		}
 		return false;

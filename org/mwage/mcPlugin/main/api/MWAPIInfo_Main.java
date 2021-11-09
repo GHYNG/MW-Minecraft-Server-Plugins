@@ -9,6 +9,7 @@ import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
  * 子插件可以使用此注解来表明子插件的依赖性。
  * 
  * @author GHYNG
+ * @since Paper-1.17.1-MW-4
  */
 @Documented
 @MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))

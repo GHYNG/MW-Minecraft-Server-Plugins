@@ -7,7 +7,7 @@ public interface ExpressiveDoubleValue<A> extends CalculatableDoubleValue<Double
 		return Double.class;
 	}
 	@Override
-	default Double getCalculatableInstance() {
-		return getExpressiveInstance();
+	default Double getInstanceC() {
+		return getInstanceE();
 	}
 }

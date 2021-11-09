@@ -7,7 +7,7 @@ public interface ActualDoubleValue<E> extends CalculatableDoubleValue<E, Double>
 		return Double.class;
 	}
 	@Override
-	default Double getCalculatableInstance() {
-		return getActualInstance();
+	default Double getInstanceC() {
+		return getInstanceA();
 	}
 }

@@ -1,5 +1,5 @@
 name: MW_Plugin_Main
-version: Paper-1.16.5-MW-3.1(pre)
+version: Paper-1.17.1-MW-4(pre)
 description: The main plugin for milkyway.
 author: GHYNG
 main: org.mwage.mcPlugin.main.Main

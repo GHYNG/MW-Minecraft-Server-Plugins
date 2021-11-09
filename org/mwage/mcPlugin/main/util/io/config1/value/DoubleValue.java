@@ -1,9 +1,9 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
 public interface DoubleValue extends ExpressiveDoubleValue<Double>, ActualDoubleValue<Double> {
 	@Override
-	default Double getCalculatableInstance() {
-		Double c1 = ExpressiveDoubleValue.super.getCalculatableInstance();
-		Double c2 = ActualDoubleValue.super.getCalculatableInstance();
+	default Double getInstanceC() {
+		Double c1 = ExpressiveDoubleValue.super.getInstanceC();
+		Double c2 = ActualDoubleValue.super.getInstanceC();
 		return c1 == c2 ? c1 : null;
 	}
 }
@@ -23,11 +23,11 @@ class DoubleValueInstance implements DoubleValue {
 		return StaticData.DOUBLE_TYPE_NAME;
 	}
 	@Override
-	public Double getExpressiveInstance() {
+	public Double getInstanceE() {
 		return value;
 	}
 	@Override
-	public Double getActualInstance() {
+	public Double getInstanceA() {
 		return value;
 	}
 	@Override
@@ -48,8 +48,8 @@ class DoubleValueInstance implements DoubleValue {
 			return(getTypeName().equals(err.getTypeName()) && me.getErrorReason().equals(err.getErrorReason()) && me.getOriginalContent().equals(err.getOriginalContent()));
 		}
 		if(another instanceof DoubleValue d) {
-			double x = getCalculatableInstance();
-			double y = d.getCalculatableInstance();
+			double x = getInstanceC();
+			double y = d.getInstanceC();
 			return x == y;
 		}
 		return false;

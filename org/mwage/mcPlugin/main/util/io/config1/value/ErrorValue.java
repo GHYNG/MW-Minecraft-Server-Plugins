@@ -45,11 +45,11 @@ class ErrorValueInstance<E, A> implements ErrorValue<E, A> {
 		return errorReason;
 	}
 	@Override
-	public E getExpressiveInstance() {
+	public E getInstanceE() {
 		return null; // return null
 	}
 	@Override
-	public A getActualInstance() {
+	public A getInstanceA() {
 		return null; // return null
 	}
 }

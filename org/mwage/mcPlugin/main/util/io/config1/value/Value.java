@@ -1,4 +1,7 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
+import java.util.HashMap;
+import java.util.Map;
+import org.mwage.mcPlugin.main.util.Function;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypeHeader;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfo;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfoble;
@@ -8,8 +11,8 @@ import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfoble;
 public interface Value<E, A> extends GenericTypesInfoble<Value<E, A>> {
 	Class<E> getClassE();
 	Class<A> getClassA();
-	E getExpressiveInstance();
-	A getActualInstance();
+	E getInstanceE();
+	A getInstanceA();
 	default void prepareGenericTypesInfo(GenericTypesInfo<?> genericTypesInfo) throws PrepareWrongGenericTypesInfoException {
 		if(getClass() != genericTypesInfo.clazz) {
 			throw new PrepareWrongGenericTypesInfoException("Only allow to prepare this value instance's own GenricTypesInfo instance.");
@@ -42,4 +45,36 @@ public interface Value<E, A> extends GenericTypesInfoble<Value<E, A>> {
 		}
 	}
 	String getTypeName();
+	default Value<?, ?> calculateKey(String key) {
+		MethodHeader header = new MethodHeader(getTypeName(), key);
+		Function<Value<?, ?>, Value<?, ?>> method = value_methods.get(header);
+		if(method != null) {
+			return method.invoke(this);
+		}
+		return null;
+	}
+	default Value<?, ?> calculateKeys(String... keys) {
+		int length = keys.length;
+		if(length == 0) {
+			return null;
+		}
+		Value<?, ?> value = calculateKey(keys[0]);
+		if(length == 1 || value == null) {
+			return value;
+		}
+		String[] newKeys = new String[length - 1];
+		for(int i = 0; i < length - 1; i++) {
+			newKeys[i] = keys[i + 1];
+		}
+		return value.calculateKeys(newKeys);
+	}
+	default Value<?, ?> calculateLongKey(String key) {
+		String[] keys = key.split("\\.");
+		return calculateKeys(keys);
+	}
+	record MethodHeader(String typeName, String methodName) {}
+	static Map<MethodHeader, Function<Value<?, ?>, Value<?, ?>>> value_methods = new HashMap<MethodHeader, Function<Value<?, ?>, Value<?, ?>>>();
+	static void registerValueMethod(MethodHeader methodHeader, Function<Value<?, ?>, Value<?, ?>> method) {
+		value_methods.put(methodHeader, method);
+	}
 }

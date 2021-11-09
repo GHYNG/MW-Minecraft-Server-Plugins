@@ -14,8 +14,8 @@ public interface CalculatableDoubleValue<E, A> extends CalculatableValue<Double,
 		if(another instanceof ErrorValue) {
 			return 0;
 		}
-		double x = getCalculatableInstance();
-		double y = another.getCalculatableInstance();
+		double x = getInstanceC();
+		double y = another.getInstanceC();
 		return x == y ? 0 : x > y ? 1 : -1;
 	}
 }
