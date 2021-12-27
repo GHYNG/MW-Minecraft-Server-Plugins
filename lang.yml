@@ -1,5 +1,7 @@
 # default language as chinese language
 
+# 请注意，不合时宜的调用字符变量会显示为null
+
 # Vote Ban
 # <sender-player-name>: 投票发起者的id
 # <target-player-name>: 被投票者的id
@@ -11,3 +13,54 @@ VoteBan-player-voted: '您已经为封禁玩家<target-player-name>投出一票�
 VoteBan-started: '玩家<sender-player-name>提意封禁玩家<target-player-name>，如果您也同意，请输入/vote-ban <target-player-name>来投票。投票成功需要至少一半在线玩家同意。'
 VoteBan-you-are-banned: '您已经被服务器玩家投票封禁。如果您认为这是一次错误的封禁，请加群（541100688）联系管理员。'
 VoteBan-player-banned: '<target-player-name>已经被投票封禁。'
+
+# Vote Normal Manage
+# <sender-name>: 命令发送者的名称
+# <vote-name>: 投票的名称
+# <selection-name>: 投票选项的名称
+# <vpp-value-old>: 单个玩家总投票上限的旧值 (int)
+# <vpp-value-new>: 单个玩家总投票上限的新值 (int)
+# <vps-value-old>: 单个玩家给单个选项投票上限的旧值 (int)
+# <vps-value-new>: 单个玩家给单个选项投票上限的新值 (int)
+# <anon-value-old>: 是否匿名投票的旧值 (boolean)
+# <anon-value-new>: 是否匿名投票的新值 (boolean)
+# <voter-name>: 投票者的名称
+VoteNormalManage-empty-parameter: '命令后参数为空：请输入 /vote-normal-manage help 来获取命令参数指南。'
+VoteNormalManage-start-need-vote-name: '请指定你需要开始的投票的名称。'
+VoteNormalManage-start-bad-identifier: '<vote-name>不是一个合法标识符。'
+VoteNormalManage-start-already-started: '一个叫做<vote-name>的投票已经开始了。'
+VoteNormalManage-start-successful-to-sender: '成功创建投票<vote-name>。'
+VoteNormalManage-start-successful-to-public: '<sender-name>发起了一个新投票：<vote-name>！'
+VoteNormalManage-setting-vote-not-found: '错误：没有找到名为<vote-name>的投票。'
+VoteNormalManage-setting-vote-is-null: '投票“<vote-name>”在内存中竟然为空，而这完全不应该发生！oh no！'
+VoteNormalManage-setting-addselection-need-name: '请指定选项的名称。'
+VoteNormalManage-setting-addselection-bad-identifier: '<selection-name>不是一个合法标识符。'
+VoteNormalManage-setting-addselection-successful-to-sender: '为投票<vote-name>创建选项<selection-name>成功！'
+VoteNormalManage-setting-addselection-successful-to-public: '<sender-name>为投票<vote-name>创建了一个新的可选项：<selection-name>！'
+VoteNormalManage-setting-addselection-unsuccessful-to-sender: '为投票<vote-name>创建选项<selection-name>失败！'
+VoteNormalManage-setting-removeselection-need-name: '请指定选项的名称。'
+VoteNormalManage-setting-removeselection-not-found: '错误：投票<vote-name>没有找到名为<selection-name>的选项。'
+VoteNormalManage-setting-removeselection-successful-to-sender: '为投票<vote-name>删除选项<selection-name>成功！'
+VoteNormalManage-setting-removeselection-successful-to-sender: '<sender-name>将投票<vote-name>中的可选项：<selection-name>删除了！'
+VoteNormalManage-setting-removeselection-unsuccessful-to-sender: '为投票<vote-name>删除选项<selection-name>失败！'
+VoteNormalManage-setting-vpp: '投票<vote-name>中，单个玩家可以投出的总票数为<vpp-value-old>。'
+VoteNormalManage-setting-vpp-smaller-than-zero: '新vpp的值为<vpp-value-new>，而它不应该小于0。'
+VoteNormalManage-setting-vpp-adjusted-to-sender: '已经成功将vpp的值从<vpp-value-old>调整为<vpp-value-new>。'
+VoteNormalManage-setting-vpp-adjusted-to-public: '<sender-name>将投票<vote-name>的单个玩家总投票上限从<vpp-value-old>调增为了<vpp-value-new>。'
+VoteNormalManage-setting-vpp-clear-player-vote-to-private: '因为在投票<vote-name>中单个玩家总投票上限修改为了<vpp-value-new>，超出了您目前的投票数量，因此您的投票被清零了，请重新投票。'
+VoteNormalManage-setting-vpp-clear-player-vote-to-public: '玩家<voter-name>在投票<vote-name>的投票被清零了，因为新的单个玩家总投票上限设定为了<vpp-value-new>，少于此玩家之前的投票总数。'
+VoteNormalManage-setting-vpp-wrong-format: '错误：<vpp-value-new>不是一个可解性的int类型值！'
+VoteNormalManage-setting-vps: '投票<vote-name>中，每个玩家可以给单个选项投出的总票数为<vps-value-old>。'
+VoteNormalManage-setting-vps-smaller-than-minus-one: '新vps的值为<vps-value-new>，而它不应该小于-1。'
+VoteNormalManage-setting-vps-adjusted-to-sender: '已经成功将vps的值从<vps-value-old>调整为<vps-value-new>。'
+VoteNormalManage-setting-vps-adjusted-to-public: '<sender-name>将投票<vote-name>的单个玩家总投票上限从<vps-value-old>调增为了<vps-value-new>。'
+VoteNormalManage-setting-vps-reset-player-vote-to-private: '因为在投票<vote-name>的单个玩家对单个选项的投票上限修改为了<vps-value-new>，超出了您在选项<selection-name>中的投票数量，因此您对该选项的投票数降为了<vps-value-new>。'
+VoteNormalManage-setting-vps-reset-player-vote-to-public: '玩家<voter-name>在投票<vote-name>的选项<selection-name>的投票数降为了<vps-value-new>，因为新的单个玩家对单个选项的投票上限设定为了<vps-value-new>，少于此玩家对此选项的投票数。'
+VoteNormalManage-setting-vps-wrong-format: '错误：<vps-value-new>不是一个可解析的int类型值！'
+VoteNormalManage-setting-anon: '投票<vote-name>中，玩家是匿名投票吗？<anon-value-old>。'
+VoteNormalManage-setting-anon-adjust-no-need: '投票<vote-name>的匿名性已经为<anon-value-new>。'
+VoteNormalManage-setting-anon-adjusted-to-sender: '已经成功将anon的值从<anon-value-old>调整为<anon-value-new>。'
+VoteNormalManage-setting-anon-adjusted-to-public: '<sender-name>将投票<vote-name>的匿名信从<anon-value-old>调整为了<anon-value-new>。'
+VoteNormalManage-setting-anon-wrong-format: '错误：<anon-value-new>不是一个可解析的boolean类型值！'
+VoteNormalManage-list-vote-not-found: '错误：没有找到名为<vote-name>的投票。'
+VoteNormalManage-list-vote-is-null: '投票“<vote-name>”在内存中竟然为空，而这完全不应该发生！oh no！'

@@ -1,5 +1,5 @@
 name: MW_Vote
-version: Paper-1.16.5-MW-1
+version: Paper-1.17.1-MW-1.1
 description: Milkyway voting system.
 author: GHYNG
 main: org.mwage.mcPlugin.vote.Main
@@ -8,11 +8,25 @@ api-version: 1.16
 
 commands:
   vote-ban:
-    description: vote ban a player. half the players of total population required!
+    description: Vote ban a player. Half the players of total population required!
     usage: Use /vote-ban <player-name> to vote ban a player. Half of the total population needed to successful ban!
     permission: mw_vote.vote-ban
+  vote-normal:
+    description: Make a normal vote on something. (this function could be improved in future)
+    usage: Use /vote-normal <vote-name> <selection-name> to make a vote.
+    permission: mw_vote.vote-normal
+  vote-normal-manage:
+    description: Manage the normal voting system.
+    usage: For the usage of this command, see /vote-normal-manage help.
+    permission: mw_vote.vote-normal.manage
     
 permissions:
   mw_vote.vote-ban:
-    description: allows player to vote ban another player.
+    description: Allows player to vote ban another player.
+    default: op
+  mw_vote.vote-normal:
+    description: Allows player to vote on a given subject.
+    default: op
+  mw_vote.vote-normal.manage:
+    description: Allows operators to manage the normal voting system.
     default: op

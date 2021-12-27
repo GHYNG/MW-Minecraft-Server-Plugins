@@ -1,8 +1,9 @@
 package org.mwage.mcPlugin.vote;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -10,13 +11,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.mwage.mcPlugin.main.Main_GeneralMethods;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
+import org.mwage.mcPlugin.vote.ban.VoteBanProcessor;
+import org.mwage.mcPlugin.vote.normal.VoteNormalManageProcessor;
 public class Main extends MWPlugin implements Main_GeneralMethods {
-	private VotePlayerSettings playerSettings;
-	private VoteConfig voteConfig;
+	public VoteConfig voteConfig;
+	protected CommandProcessor commandProcessor;
+	protected VoteBanProcessor voteBanProcessor;
+	protected VoteNormalManageProcessor voteNormalManageProcessor;
 	@Override
 	public void onEnable() {
 		initFiles();
-		playerSettings = new VotePlayerSettings(this);
+		commandProcessor = new CommandProcessor(this);
+		voteBanProcessor = new VoteBanProcessor(this);
+		voteNormalManageProcessor = new VoteNormalManageProcessor(this);
 		voteConfig = new VoteConfig(this);
 	}
 	public void initFiles() {
@@ -33,49 +40,12 @@ public class Main extends MWPlugin implements Main_GeneralMethods {
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!command.getName().equalsIgnoreCase("vote-ban")) {
+		if(command.getName().equalsIgnoreCase("vote-ban")) {}
+		CommandProcessMethod method = commandProcessor.methods.get(command.getName());
+		if(method == null) {
 			return false;
 		}
-		VoteConfig.LanguageConfig.VoteLanguageConfig vlc = voteConfig.languageConfig.voteLanguageConfig;
-		String senderName = sender.getName();
-		int argLength = args.length;
-		if(argLength != 1) {
-			sender.sendMessage(vlc.convertMessage(vlc.wrong_parameter, senderName, "null"));
-			return false;
-		}
-		if(!(sender instanceof Player)) {
-			sender.sendMessage(vlc.convertMessage(vlc.only_player_may_run_this_command, senderName, "null"));
-			return false;
-		}
-		Player target = Bukkit.getServer().getPlayer(args[0]);
-		String targetName = args[0];
-		if(target == null) {
-			sender.sendMessage(vlc.convertMessage(vlc.player_not_found, senderName, targetName));
-			return true;
-		}
-		targetName = target.getName();
-		Player player = (Player)sender;
-		VotePlayerSetting setting = playerSettings.get(target);
-		if(setting.playersWantMeBanned.contains(player.getUniqueId())) {
-			setting.playersWantMeBanned.remove(player.getUniqueId());
-			sender.sendMessage(vlc.convertMessage(vlc.player_cancelled_vote, senderName, targetName));
-		}
-		else {
-			setting.playersWantMeBanned.add(player.getUniqueId());
-			sender.sendMessage(vlc.convertMessage(vlc.player_voted, senderName, targetName));;
-		}
-		Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
-		int totalSize = onlinePlayers.size();
-		int voteSize = setting.playersWantMeBanned.size();
-		if(voteSize == 1) {
-			serverSay(vlc.convertMessage(vlc.started, senderName, targetName));
-		}
-		if(voteSize >= totalSize * voteConfig.voteBanPercentage) {
-			banPlayer(target, vlc.convertMessage(vlc.you_are_banned, senderName, targetName));
-			serverSay(vlc.convertMessage(vlc.player_banned, senderName, targetName));
-			setting.playersWantMeBanned.clear();
-		}
-		return true;
+		return method.onCommand(this, sender, command, label, args);
 	}
 	public void banPlayer(Player player, String reason) {
 		CommandSender sender = Bukkit.getConsoleSender();
@@ -85,5 +55,19 @@ public class Main extends MWPlugin implements Main_GeneralMethods {
 		if(!event.isCancelled()) {
 			Bukkit.dispatchCommand(sender, command);
 		}
+	}
+	// @Override // this is not implemented in MW-Plugin-Main yet
+	public int getAPIVersion() {
+		return -1;
+	}
+	public void registerCommandProcessMethod(String command, CommandProcessMethod method) {
+		commandProcessor.methods.put(command, method);
+	}
+}
+class CommandProcessor {
+	public final Main plugin;
+	protected Map<String, CommandProcessMethod> methods = new HashMap<String, CommandProcessMethod>();
+	CommandProcessor(Main plugin) {
+		this.plugin = plugin;
 	}
 }
