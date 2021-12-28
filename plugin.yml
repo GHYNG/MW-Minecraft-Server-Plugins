@@ -1,0 +1,5 @@
+name: MW_Event_NewYear_2022
+version: Paper-1.17.1-MW-1
+description: Plugin for 2022 new year event
+author: GHYNG
+main: org.mwage.mcPlugin.event_newYear_2022.Main
