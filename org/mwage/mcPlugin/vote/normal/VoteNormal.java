@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 public class VoteNormal {
 	public class Selection {
 		public final String name;
-		protected Map<UUID, Integer> voteCount = new HashMap<UUID, Integer>();
+		protected Map<UUID, Integer> playerVoteCounts = new HashMap<UUID, Integer>();
 		public Selection(String name) {
 			this.name = name;
 		}
@@ -17,14 +17,14 @@ public class VoteNormal {
 			UUID uuid = player.getUniqueId();
 			{
 				// init hash table
-				Integer i = voteCount.get(uuid);
+				Integer i = playerVoteCounts.get(uuid);
 				if(i == null) {
-					voteCount.put(uuid, 0);
+					playerVoteCounts.put(uuid, 0);
 				}
 			}
 			int playerTotalVoted = getTotalCastsFromPlayer(player);
-			int playerSelectionVoted = voteCount.get(uuid);
-			if(playerTotalVoted + newVotes > vpp || playerSelectionVoted > vps) {
+			int playerSelectionVoted = playerVoteCounts.get(uuid);
+			if(playerTotalVoted + newVotes > vpp || (playerSelectionVoted > vps && vps > 0)) {
 				return false;
 			}
 			if(playerSelectionVoted + newVotes < 0) {
@@ -35,20 +35,20 @@ public class VoteNormal {
 			return true;
 		}
 		public void setCastsFromPlayer(Player player, int amount) {
-			voteCount.put(player.getUniqueId(), amount);
+			playerVoteCounts.put(player.getUniqueId(), amount);
 		}
 		public int getCastsFromPlayer(Player player) {
-			Integer count = voteCount.get(player.getUniqueId());
+			Integer count = playerVoteCounts.get(player.getUniqueId());
 			if(count == null) {
 				count = 0;
-				voteCount.put(player.getUniqueId(), count);
+				playerVoteCounts.put(player.getUniqueId(), count);
 			}
 			return count;
 		}
 		public int getTotalCasts() {
 			int total = 0;
-			for(UUID uuid : voteCount.keySet()) {
-				Integer i = voteCount.get(uuid);
+			for(UUID uuid : playerVoteCounts.keySet()) {
+				Integer i = playerVoteCounts.get(uuid);
 				if(i == null) {
 					continue;
 				}
@@ -84,7 +84,7 @@ public class VoteNormal {
 		return true;
 	}
 	public boolean removeSelection(String name) {
-		if(selections.containsKey(name)) {
+		if(!selections.containsKey(name)) {
 			return false;
 		}
 		selections.remove(name);
@@ -98,7 +98,7 @@ public class VoteNormal {
 			if(selection == null) {
 				continue;
 			}
-			Integer v = selection.voteCount.get(uuid);
+			Integer v = selection.playerVoteCounts.get(uuid);
 			if(v == null) {
 				continue;
 			}
@@ -126,7 +126,7 @@ public class VoteNormal {
 			if(selection == null) {
 				continue;
 			}
-			for(UUID uuid : selection.voteCount.keySet()) {
+			for(UUID uuid : selection.playerVoteCounts.keySet()) {
 				uuids.add(uuid);
 			}
 		}

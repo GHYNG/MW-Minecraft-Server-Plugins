@@ -1,11 +1,24 @@
 # This is the config file for Milkyway Vote Plugin.
 # For detailed information, you can visit https://github.com/GHYNG/MW-Minecraft-Server-Plugins
 
+
+
 # The language used for this plugin.
 # You can always add new language files.
 # Note: Use full file name with extension.
 language: 'lang.yml'
 
+
+
+# Vote Ban
+
 # The percentage of number of players required to vote successfully.
 # Default: 0.5 (means 50%)
 vote-ban-percentage: 0.5
+
+
+
+# Vote Normal
+
+# The max votes one player can cast per command
+vote-normal-max-casts: 25565

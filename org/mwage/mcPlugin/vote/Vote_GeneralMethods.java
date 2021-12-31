@@ -15,7 +15,7 @@ public interface Vote_GeneralMethods {
 			if(newStr == null) {
 				continue;
 			}
-			processedContent = originalContent.replaceAll(key, newStr);
+			processedContent = processedContent.replaceAll(key, newStr);
 		}
 		return processedContent;
 	}

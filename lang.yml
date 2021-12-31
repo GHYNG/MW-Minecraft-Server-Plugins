@@ -1,10 +1,16 @@
 # default language as chinese language
 
+
+
 # 请注意，不合时宜的调用字符变量会显示为null
 
+
+
 # Vote Ban
+
 # <sender-player-name>: 投票发起者的id
 # <target-player-name>: 被投票者的id
+
 VoteBan-wrong-parameter: '参数数量错误：唯一参数为玩家id。'
 VoteBan-only-player-may-run-this-command: '只有玩家可以使用这条指令。'
 VoteBan-player-not-found: '未找到在线玩家<target-player-name>。'
@@ -14,7 +20,11 @@ VoteBan-started: '玩家<sender-player-name>提意封禁玩家<target-player-nam
 VoteBan-you-are-banned: '您已经被服务器玩家投票封禁。如果您认为这是一次错误的封禁，请加群（541100688）联系管理员。'
 VoteBan-player-banned: '<target-player-name>已经被投票封禁。'
 
+
+
 # Vote Normal Manage
+
+# <max-casts-value>: 一次命令最多可以投出的票数（用于防止内存溢出） (int)
 # <sender-name>: 命令发送者的名称
 # <vote-name>: 投票的名称
 # <selection-name>: 投票选项的名称
@@ -25,7 +35,9 @@ VoteBan-player-banned: '<target-player-name>已经被投票封禁。'
 # <anon-value-old>: 是否匿名投票的旧值 (boolean)
 # <anon-value-new>: 是否匿名投票的新值 (boolean)
 # <voter-name>: 投票者的名称
+# <vote-count>: 投票的计数（可能是不同部分的计数，比如总数或某个分项的计数） (int)
 VoteNormalManage-empty-parameter: '命令后参数为空：请输入 /vote-normal-manage help 来获取命令参数指南。'
+
 VoteNormalManage-start-need-vote-name: '请指定你需要开始的投票的名称。'
 VoteNormalManage-start-bad-identifier: '<vote-name>不是一个合法标识符。'
 VoteNormalManage-start-already-started: '一个叫做<vote-name>的投票已经开始了。'
@@ -41,7 +53,7 @@ VoteNormalManage-setting-addselection-unsuccessful-to-sender: '为投票<vote-na
 VoteNormalManage-setting-removeselection-need-name: '请指定选项的名称。'
 VoteNormalManage-setting-removeselection-not-found: '错误：投票<vote-name>没有找到名为<selection-name>的选项。'
 VoteNormalManage-setting-removeselection-successful-to-sender: '为投票<vote-name>删除选项<selection-name>成功！'
-VoteNormalManage-setting-removeselection-successful-to-sender: '<sender-name>将投票<vote-name>中的可选项：<selection-name>删除了！'
+VoteNormalManage-setting-removeselection-successful-to-remove: '<sender-name>将投票<vote-name>中的可选项：<selection-name>删除了！'
 VoteNormalManage-setting-removeselection-unsuccessful-to-sender: '为投票<vote-name>删除选项<selection-name>失败！'
 VoteNormalManage-setting-vpp: '投票<vote-name>中，单个玩家可以投出的总票数为<vpp-value-old>。'
 VoteNormalManage-setting-vpp-smaller-than-zero: '新vpp的值为<vpp-value-new>，而它不应该小于0。'
@@ -53,14 +65,51 @@ VoteNormalManage-setting-vpp-wrong-format: '错误：<vpp-value-new>不是一个
 VoteNormalManage-setting-vps: '投票<vote-name>中，每个玩家可以给单个选项投出的总票数为<vps-value-old>。'
 VoteNormalManage-setting-vps-smaller-than-minus-one: '新vps的值为<vps-value-new>，而它不应该小于-1。'
 VoteNormalManage-setting-vps-adjusted-to-sender: '已经成功将vps的值从<vps-value-old>调整为<vps-value-new>。'
-VoteNormalManage-setting-vps-adjusted-to-public: '<sender-name>将投票<vote-name>的单个玩家总投票上限从<vps-value-old>调增为了<vps-value-new>。'
+VoteNormalManage-setting-vps-adjusted-to-public: '<sender-name>将投票<vote-name>的单个玩家总投票上限从<vps-value-old>调整为了<vps-value-new>。'
 VoteNormalManage-setting-vps-reset-player-vote-to-private: '因为在投票<vote-name>的单个玩家对单个选项的投票上限修改为了<vps-value-new>，超出了您在选项<selection-name>中的投票数量，因此您对该选项的投票数降为了<vps-value-new>。'
 VoteNormalManage-setting-vps-reset-player-vote-to-public: '玩家<voter-name>在投票<vote-name>的选项<selection-name>的投票数降为了<vps-value-new>，因为新的单个玩家对单个选项的投票上限设定为了<vps-value-new>，少于此玩家对此选项的投票数。'
 VoteNormalManage-setting-vps-wrong-format: '错误：<vps-value-new>不是一个可解析的int类型值！'
 VoteNormalManage-setting-anon: '投票<vote-name>中，玩家是匿名投票吗？<anon-value-old>。'
 VoteNormalManage-setting-anon-adjust-no-need: '投票<vote-name>的匿名性已经为<anon-value-new>。'
 VoteNormalManage-setting-anon-adjusted-to-sender: '已经成功将anon的值从<anon-value-old>调整为<anon-value-new>。'
-VoteNormalManage-setting-anon-adjusted-to-public: '<sender-name>将投票<vote-name>的匿名信从<anon-value-old>调整为了<anon-value-new>。'
+VoteNormalManage-setting-anon-adjusted-to-public: '<sender-name>将投票<vote-name>的匿名性从<anon-value-old>调整为了<anon-value-new>。'
 VoteNormalManage-setting-anon-wrong-format: '错误：<anon-value-new>不是一个可解析的boolean类型值！'
 VoteNormalManage-list-vote-not-found: '错误：没有找到名为<vote-name>的投票。'
 VoteNormalManage-list-vote-is-null: '投票“<vote-name>”在内存中竟然为空，而这完全不应该发生！oh no！'
+VoteNormalManage-stop-need-vote-name: '请指定你需要结束的投票的名称。'
+VoteNormalManage-stop-vote-is-null: '投票“<vote-name>”在内存中竟然为空，而这完全不应该发生！oh no！'
+VoteNormalManage-stop-successful-to-sender: '成功结束投票<vote-name>。'
+VoteNormalManage-stop-successful-to-public: '<sender-name>结束了投票：<vote-name>！'
+VoteNormalManage-stop-settle-general: '投票<vote-name>：共<vote-count>票'
+VoteNormalManage-stop-settle-selection: '选项<selection-name>：<vote-count>票'
+VoteNormalManage-stop-settle-player: '【<voter-name> <vote-count>票】；'
+
+# Vote Normal
+
+# <vote-name>: 投票的名称
+# <selection-name>: 选项的名称
+# <voter-name>: 投票者的名称
+# <vote-count>: 投票数 (int)
+# <total-voted-count>: 总已经投票数 (int)
+# <selection-voted-count>: 某个选项已经投票数 (int)
+# <vpp-value>: 单个玩家总投票上限的值 (int)
+# <vps-value>: 单个玩家给单个选项投票上限的值 (int)
+# <anon-value>: 是否匿名投票的值 (boolean)
+
+VoteNormal-sender-must-be-player: '该命令的发送者必须是玩家（而不是控制台什么的）'
+VoteNormal-help: '输入/vote-normal [投票名] [选项名] [票数（可以是负数，意味着撤回该数量的投票）] 来投票'
+VoteNormal-vote-not-found: '错误：未找到名为<vote-name>的投票'
+VoteNormal-vote-is-null: '投票“<vote-name>”在内存中竟然为空，而这完全不应该发生！oh no！'
+VoteNormal-vote-help: '这是名为<vote-name>的投票。您总共可以投<vpp-value>票，其中给每个选项最多投<vps-value>票。这个投票的匿名性为<anon-value>。这个投票的选项有（见下行）（忽略方括号）：'
+VoteNormal-vote-help-selections: '【<selection-name>】；'
+VoteNormal-selection-not-found: '错误：未在投票<vote-name>中找到名为<selection-name>的选项'
+VoteNormal-selection-is-null: '选项“<selection-name>”在内存中竟然为空，而这完全不应该发生！oh no！'
+VoteNormal-selection-help: '您已经为选项<selection-name>投了<selection-voted-count>票，而您已经为整个投票投了<total-voted-count>票。您总共最多可以投<vpp-value>票，对单个选项最多可以投<vps-value>票。（如果此投票是非匿名的，将在下一行显示已经为该投票的玩家与票数）'
+VoteNormal-selection-help-voters: '【<voter-name> <vote-count>票】；'
+VoteNormal-above-vpp: '您总共最多可以投<vpp-value>票，而您已经投出了<total-voted-count>票。因此本次指令您的投票数降为了<vote-count>。'
+VoteNormal-above-vps: '您对单个选项最多可以投<vps-value>票，而您已经为<selection-name>投了<selection-voted-count>。因此本次指令您的投票数降为了<vote-count>。'
+VoteNormal-below-0: '您投出的票数将使您对<selection-name>的票数变为负数。因此本次指令您的投票数升为了<vote-count>。'
+VoteNormal-vote-successful-to-sender: '您对投票<vote-name>的选项<selection-name>投出了<vote-count>票。'
+VoteNormal-vote-unsuccessful-to-sender: '您对投票<vote-name>的选项<selection-name>投票失败，而写这个插件的人都不知道为什么会出现这种情况！'
+VoteNormal-vote-successful-to-public: '玩家<voter-name>对投票<vote-name>的选项<selection-name>投出了<vote-count>票！'
+VoteNormal-wrong-format: '错误：<vote-count>不是一个可解析的int类型值！'

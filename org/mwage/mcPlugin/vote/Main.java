@@ -13,18 +13,28 @@ import org.mwage.mcPlugin.main.Main_GeneralMethods;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
 import org.mwage.mcPlugin.vote.ban.VoteBanProcessor;
 import org.mwage.mcPlugin.vote.normal.VoteNormalManageProcessor;
+import org.mwage.mcPlugin.vote.normal.VoteNormalProcessor;
+import org.mwage.mcPlugin.vote.normal.VoteNormalSystem;
 public class Main extends MWPlugin implements Main_GeneralMethods {
 	public VoteConfig voteConfig;
-	protected CommandProcessor commandProcessor;
+	public VoteNormalSystem voteNormalSystem;
+	protected CommandProcessorManager commandProcessorManager;
 	protected VoteBanProcessor voteBanProcessor;
 	protected VoteNormalManageProcessor voteNormalManageProcessor;
+	protected VoteNormalProcessor voteNormalProcessor;
 	@Override
 	public void onEnable() {
 		initFiles();
-		commandProcessor = new CommandProcessor(this);
+		voteNormalSystem = new VoteNormalSystem(this);
+		commandProcessorManager = new CommandProcessorManager(this);
 		voteBanProcessor = new VoteBanProcessor(this);
 		voteNormalManageProcessor = new VoteNormalManageProcessor(this);
+		voteNormalProcessor = new VoteNormalProcessor(this);
 		voteConfig = new VoteConfig(this);
+	}
+	@Override
+	public void onDisable() {
+		voteNormalSystem.onDisable();
 	}
 	public void initFiles() {
 		List<String> fileNames = new ArrayList<String>();
@@ -41,11 +51,11 @@ public class Main extends MWPlugin implements Main_GeneralMethods {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(command.getName().equalsIgnoreCase("vote-ban")) {}
-		CommandProcessMethod method = commandProcessor.methods.get(command.getName());
+		CommandProcessorInterface method = commandProcessorManager.methods.get(command.getName());
 		if(method == null) {
 			return false;
 		}
-		return method.onCommand(this, sender, command, label, args);
+		return method.onCommand(sender, command, label, args);
 	}
 	public void banPlayer(Player player, String reason) {
 		CommandSender sender = Bukkit.getConsoleSender();
@@ -60,14 +70,14 @@ public class Main extends MWPlugin implements Main_GeneralMethods {
 	public int getAPIVersion() {
 		return -1;
 	}
-	public void registerCommandProcessMethod(String command, CommandProcessMethod method) {
-		commandProcessor.methods.put(command, method);
+	public void registerCommandProcessor(CommandProcessorInterface method) {
+		commandProcessorManager.methods.put(method.getCommand(), method);
 	}
 }
-class CommandProcessor {
+class CommandProcessorManager {
 	public final Main plugin;
-	protected Map<String, CommandProcessMethod> methods = new HashMap<String, CommandProcessMethod>();
-	CommandProcessor(Main plugin) {
+	protected Map<String, CommandProcessorInterface> methods = new HashMap<String, CommandProcessorInterface>();
+	CommandProcessorManager(Main plugin) {
 		this.plugin = plugin;
 	}
 }

@@ -13,7 +13,7 @@ commands:
     permission: mw_vote.vote-ban
   vote-normal:
     description: Make a normal vote on something. (this function could be improved in future)
-    usage: Use /vote-normal <vote-name> <selection-name> to make a vote.
+    usage: Use /vote-normal <vote-name> <selection-name> <amount> to make a vote.
     permission: mw_vote.vote-normal
   vote-normal-manage:
     description: Manage the normal voting system.
