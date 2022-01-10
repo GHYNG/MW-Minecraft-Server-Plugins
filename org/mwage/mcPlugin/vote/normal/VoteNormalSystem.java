@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -146,6 +148,9 @@ public class VoteNormalSystem {
 		for(UUID uuid : selection.playerVoteCounts.keySet()) {
 			int count = selection.playerVoteCounts.get(uuid) == null ? 0 : selection.playerVoteCounts.get(uuid);
 			Map<String, Object> mapPlayerVoteCount = new LinkedHashMap<String, Object>();
+			OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+			String playerName = player == null ? "null" : player.getName();
+			mapPlayerVoteCount.put("name", playerName);
 			mapPlayerVoteCount.put("uuid", uuid.toString());
 			mapPlayerVoteCount.put("count", count);
 			listPlayerVoteCounts.add(mapPlayerVoteCount);

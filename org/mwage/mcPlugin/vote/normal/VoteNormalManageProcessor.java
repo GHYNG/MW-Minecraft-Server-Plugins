@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -223,16 +224,18 @@ public class VoteNormalManageProcessor extends AbstractCommandProcessor implemen
 											}
 											else {
 												sender.sendMessage(convertMessage(vlc.setting_vpp_adjusted_to_sender, strConv));
-												plugin.serverSay(convertMessage(vlc.setting_vpp_adjusted_to_sender, strConv));
+												plugin.serverSay(convertMessage(vlc.setting_vpp_adjusted_to_public, strConv));
 												if(vppNew < voteNormal.vpp) {
-													Set<? extends Player> players = voteNormal.getPlayers();
-													for(Player player : players) {
-														strConv.put("<voter\\-name>", player.getName());
-														if(vppNew < voteNormal.getTotalCastsFromPlayer(player)) {
-															voteNormal.clearPlayerCasts(player);
-															player.sendMessage(convertMessage(vlc.setting_vpp_clear_player_vote_to_private, strConv));
-															if(!voteNormal.anon) {
-																plugin.serverSay(convertMessage(vlc.setting_vpp_clear_player_vote_to_public, strConv));
+													Set<? extends OfflinePlayer> players = voteNormal.getPlayers();
+													for(OfflinePlayer player : players) {
+														if(player instanceof Player onlinePlayer) {
+															strConv.put("<voter\\-name>", player.getName());
+															if(vppNew < voteNormal.getTotalCastsFromPlayer(player)) {
+																voteNormal.clearPlayerCasts(player);
+																onlinePlayer.sendMessage(convertMessage(vlc.setting_vpp_clear_player_vote_to_private, strConv));
+																if(!voteNormal.anon) {
+																	plugin.serverSay(convertMessage(vlc.setting_vpp_clear_player_vote_to_public, strConv));
+																}
 															}
 														}
 													}
@@ -265,21 +268,23 @@ public class VoteNormalManageProcessor extends AbstractCommandProcessor implemen
 												sender.sendMessage(convertMessage(vlc.setting_vps_adjusted_to_sender, strConv));
 												plugin.serverSay(convertMessage(vlc.setting_vps_adjusted_to_public, strConv));
 												if(vpsNew < voteNormal.vps) {
-													Set<? extends Player> players = voteNormal.getPlayers();
+													Set<? extends OfflinePlayer> players = voteNormal.getPlayers();
 													for(String selectionName : voteNormal.selections.keySet()) {
 														Selection selection = voteNormal.selections.get(selectionName);
 														if(selection == null) {
 															continue;
 														}
 														strConv.put("<selection\\-name>", selection.name);
-														for(Player player : players) {
-															strConv.put("<voter\\-name>", player.getName());
-															int amountVoted = selection.getCastsFromPlayer(player);
-															if(amountVoted > vpsNew) {
-																selection.setCastsFromPlayer(player, vpsNew);
-																player.sendMessage(convertMessage(vlc.setting_vps_reset_player_vote_to_private, strConv));
-																if(!voteNormal.anon) {
-																	plugin.serverSay(convertMessage(vlc.setting_vps_reset_player_vote_to_public, strConv));
+														for(OfflinePlayer offlinePlayer : players) {
+															if(offlinePlayer instanceof Player player) {
+																strConv.put("<voter\\-name>", offlinePlayer.getName());
+																int amountVoted = selection.getCastsFromPlayer(offlinePlayer);
+																if(amountVoted > vpsNew && vpsNew >= 0) {
+																	selection.setCastsFromPlayer(offlinePlayer, vpsNew);
+																	player.sendMessage(convertMessage(vlc.setting_vps_reset_player_vote_to_private, strConv));
+																	if(!voteNormal.anon) {
+																		plugin.serverSay(convertMessage(vlc.setting_vps_reset_player_vote_to_public, strConv));
+																	}
 																}
 															}
 														}
@@ -381,12 +386,12 @@ public class VoteNormalManageProcessor extends AbstractCommandProcessor implemen
 									if(playerCasts == null) {
 										continue;
 									}
-									Player player = Bukkit.getPlayer(uuid);
+									OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 									if(player == null) {
 										continue;
 									}
 									String playerName = player.getName();
-									sender.sendMessage("    " + playerName + ": " + playerCasts);
+									sender.sendMessage("        " + playerName + ": " + playerCasts);
 								}
 							}
 							return true;
@@ -425,7 +430,7 @@ public class VoteNormalManageProcessor extends AbstractCommandProcessor implemen
 								if(!voteNormal.anon) {
 									String line = "";
 									for(UUID uuid : selection.playerVoteCounts.keySet()) {
-										Player player = Bukkit.getPlayer(uuid);
+										OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 										int cast = selection.getCastsFromPlayer(player);
 										strConv.put("<voter\\-name>", player.getName());
 										strConv.put("<vote\\-count>", "" + cast);

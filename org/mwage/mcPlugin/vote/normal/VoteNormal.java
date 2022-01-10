@@ -5,15 +5,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 public class VoteNormal {
+	protected UUID owner = null; // ownership of this voting. null is managed by op. not implemented yet
 	public class Selection {
 		public final String name;
 		protected Map<UUID, Integer> playerVoteCounts = new HashMap<UUID, Integer>();
 		public Selection(String name) {
 			this.name = name;
 		}
-		public boolean castVote(Player player, int newVotes) {
+		public boolean castVote(OfflinePlayer player, int newVotes) {
 			UUID uuid = player.getUniqueId();
 			{
 				// init hash table
@@ -34,10 +35,10 @@ public class VoteNormal {
 			setCastsFromPlayer(player, playerSelectionVoted + newVotes);
 			return true;
 		}
-		public void setCastsFromPlayer(Player player, int amount) {
+		public void setCastsFromPlayer(OfflinePlayer player, int amount) {
 			playerVoteCounts.put(player.getUniqueId(), amount);
 		}
-		public int getCastsFromPlayer(Player player) {
+		public int getCastsFromPlayer(OfflinePlayer player) {
 			Integer count = playerVoteCounts.get(player.getUniqueId());
 			if(count == null) {
 				count = 0;
@@ -90,7 +91,7 @@ public class VoteNormal {
 		selections.remove(name);
 		return true;
 	}
-	public int getTotalCastsFromPlayer(Player player) {
+	public int getTotalCastsFromPlayer(OfflinePlayer player) {
 		int votes = 0;
 		UUID uuid = player.getUniqueId();
 		for(String selectionName : selections.keySet()) {
@@ -108,12 +109,12 @@ public class VoteNormal {
 	}
 	public int getTotalCasts() {
 		int total = 0;
-		for(Player player : getPlayers()) {
+		for(OfflinePlayer player : getPlayers()) {
 			total += getTotalCastsFromPlayer(player);
 		}
 		return total;
 	}
-	public void clearPlayerCasts(Player player) {
+	public void clearPlayerCasts(OfflinePlayer player) {
 		for(String selectionName : selections.keySet()) {
 			Selection selection = selections.get(selectionName);
 			selection.setCastsFromPlayer(player, 0);
@@ -132,11 +133,11 @@ public class VoteNormal {
 		}
 		return uuids;
 	}
-	public Set<? extends Player> getPlayers() {
-		Set<Player> players = new HashSet<Player>();
+	public Set<? extends OfflinePlayer> getPlayers() {
+		Set<OfflinePlayer> players = new HashSet<OfflinePlayer>();
 		Set<? extends UUID> uuids = getPlayerUUIDs();
 		for(UUID uuid : uuids) {
-			Player player = Bukkit.getPlayer(uuid);
+			OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 			players.add(player);
 		}
 		return players;
