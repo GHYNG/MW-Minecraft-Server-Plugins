@@ -1,74 +1,83 @@
-# MW-Minecraft-Server-Plugins
-用于奶路服务器的插件。
+# 奶路投票插件
 
-# 如何下载：
-在 https://github.com/GHYNG/MW-Minecraft-Server-Plugins/releases 页面中下载各个标题下的Jar文件，并将这些文件放入服务器目录下面的plugins文件夹中即可。如果服务器已经在运行，需要reload服务器。建议下载标题中带有“Newest”字样的最新版本插件。
+奶路投票插件用于为服务器提供投票功能支持。
 
-# 已有插件介绍
+## 普通投票
 
-## MW-Plugin-Main
-奶路主插件，主要是为各子插件提供支持。
+普通投票指的是玩家可以围绕某个话题进行投票。
+同时可以有多个投票（下称问卷）。
+每个问卷有多个选项，玩家可以就这些选项进行选择并投票。
 
-这个插件的设计目的是为了给各子插件提供抽象的，非具体情景化的支持，比如逻辑运算，和服务器总的方法支持。如果需要更具体的情景支持，应当设立专门的子插件提供方法。
+每个投票有若干个属性：
 
-## MW-Block-Protection
-方块保护。主要是取消了爆炸对方块的伤害以及大多数生物对方块的影响。
+	vpp: 每个玩家可以为该问卷投出的总票数上限。
+	vps: 每个玩家可以为该问卷的单个选项投出的票数上限。
+	anon: 该问卷是否匿名。
+	
+举例：假设一个名为```color```的问卷，
+有三个分别名为```red```、```green```、```blue```的选项，
+```vpp```为```3```，```vps```为```2```，```anon```为```true```，
+那么玩家总共可以投出```3```票，为每个选项最多可以投出```2```票，这个问卷是匿名的。
 
-这个插件未来将会做出更多改进，包括对不同的世界做出不同的反应。
+### 玩家使用的指令
 
-### 硬依赖：
-MW-Plugin-Main
+使用```/vote-normal <vote_name> <selection_name> <count>```来投票。
 
-## MW-Chat
-聊天插件。主要是在聊天栏中显示头衔，以及聊天时发出“叮”的一声。
+其中```<vote_name>```为问卷名，```<selection_name>```为选项名，```<count>```为投出的票数（必须是整数）。
+票数可以是负数，意味着收回对该选项的先前投票。
 
-如果同时存在MW-Color-Code插件，将会在MW-Color-Code插件之后加载。
+举例：为名为```color```的问卷的名为```red```的选项投出```2```票，使用指令：
+```
+/vote-normal color red 2
+```
 
-## 存在的问题：
-显示的头衔与LuckPerm不一致。
+### 管理使用指令（玩家可以忽略这条）
 
-### 硬依赖：
-MW-Plugin-Main
+管理使用```/vote-normal-manage```指令控制问卷系统。
 
-### 软依赖：
-MW-Color-Code
+注意：下文中的各种名称必须符合Java命名规则，但无视关键字。
 
-## MW-Chat-Command
-MWC命令插件，用于给服主运行各种命令。这些命令允许服主在不拥有OP权限时运行。
+#### 开始新问卷
+```
+/vote-normal-manage start <vote_name>
+```
 
-如果存在MW-Chat插件，将会在MW-Chat插件之后加载。
+#### 调整问卷属性
+```
+/vote-normal-manage setting <property> <value>
+```
 
-### 硬依赖：
-MW-Plugin-Main
+比如，如果想要把匿名性调整为假，使用
+```
+/vote-normal-manage setting anon false
+```
 
-### 软依赖：
-MW-Chat
+##### 默认属性
 
-## MW-Color-Code
-字符颜色插件。给聊天栏，告示栏，书本，铁毡命名中的字符根据规则添加颜色或风格。
+属性有各自的默认值：
 
-### 硬依赖：
-MW-Plugin-Main
+	anon = true
+	vpp = 0
+	vps = 0
 
-## MW-Player-Death-Message
-当玩家死亡时，服务器广播位置。
+#### 查阅问卷信息
 
-这个插件未来有可能会被取消，功能会被整合进其它插件。
+查看所有问卷简略信息：
+```
+/vote-normal-manage list
+```
 
-### 硬依赖：
-MW-Plugin-Main
+查看指定问卷信息：
+```
+/vote-normal-manage list <vote_name>
+```
 
-## MW-World-Management
-多世界管理插件。注意这个插件只是辅助功能，管理不同世界的特性。本身并不是多时间插件。如果想要多时间插件，请另外寻找。
+#### 结束指定问卷并唱片
 
-### 硬依赖：
-MW-Plugin-Main
+```
+/vote-normal-manage stop <vote_name>
+```
+	
+## 投票ban人
 
-# 未来插件展望：
-以下这些插件，有些几乎制作完毕，有些还刚开始设计，而有些只是提出了概念
-
-## MW-File-Management
-负责管理服务器文件的插件。普通玩家不会与这个插件直接交互。这个插件将会给其它插件提供文件管理的方法支持。将会成为大多数插件的直属父插件。
-
-## MW-Server-Interactive
-服务器（娘）与玩家互动的插件。将会将主插件的部分功能转移给此插件（待定）。
+还没有实际应用，先不写。
