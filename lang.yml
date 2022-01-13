@@ -65,7 +65,7 @@ VoteNormalManage-setting-vpp-wrong-format: '错误：<vpp-value-new>不是一个
 VoteNormalManage-setting-vps: '投票<vote-name>中，每个玩家可以给单个选项投出的总票数为<vps-value-old>。'
 VoteNormalManage-setting-vps-smaller-than-minus-one: '新vps的值为<vps-value-new>，而它不应该小于-1。'
 VoteNormalManage-setting-vps-adjusted-to-sender: '已经成功将vps的值从<vps-value-old>调整为<vps-value-new>。'
-VoteNormalManage-setting-vps-adjusted-to-public: '<sender-name>将投票<vote-name>的单个玩家总投票上限从<vps-value-old>调整为了<vps-value-new>。'
+VoteNormalManage-setting-vps-adjusted-to-public: '<sender-name>将投票<vote-name>的单个玩家对单个选项投票上限从<vps-value-old>调整为了<vps-value-new>。'
 VoteNormalManage-setting-vps-reset-player-vote-to-private: '因为在投票<vote-name>的单个玩家对单个选项的投票上限修改为了<vps-value-new>，超出了您在选项<selection-name>中的投票数量，因此您对该选项的投票数降为了<vps-value-new>。'
 VoteNormalManage-setting-vps-reset-player-vote-to-public: '玩家<voter-name>在投票<vote-name>的选项<selection-name>的投票数降为了<vps-value-new>，因为新的单个玩家对单个选项的投票上限设定为了<vps-value-new>，少于此玩家对此选项的投票数。'
 VoteNormalManage-setting-vps-wrong-format: '错误：<vps-value-new>不是一个可解析的int类型值！'
