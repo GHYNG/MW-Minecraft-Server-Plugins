@@ -1,13 +1,8 @@
 package org.mwage.mcPlugin.note;
 import java.util.HashMap;
 import java.util.Map;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerEditBookEvent;
-import org.bukkit.inventory.meta.BookMeta;
 import org.mwage.mcPlugin.main.standard.plugin.MWPlugin;
 import org.mwage.mcPlugin.note.player.NotePlayerProcessor;
 public class Main extends MWPlugin {
@@ -17,7 +12,10 @@ public class Main extends MWPlugin {
 	public void onEnable() {
 		commandProcessorManager = new CommandProcessorManager(this);
 		notePlayerProcessor = new NotePlayerProcessor(this);
-		// registerListener(new TestListener());
+	}
+	@Override
+	public void onDisable() {
+		notePlayerProcessor.onDisable();
 	}
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -36,15 +34,5 @@ class CommandProcessorManager {
 	protected Map<String, CommandProcessorInterface> methods = new HashMap<String, CommandProcessorInterface>();
 	CommandProcessorManager(Main plugin) {
 		this.plugin = plugin;
-	}
-}
-class TestListener implements Listener {
-	@SuppressWarnings("deprecation")
-	@EventHandler
-	public void onPlayerEditBook(PlayerEditBookEvent event) {
-		BookMeta bm = event.getNewBookMeta();
-		Bukkit.broadcastMessage("Title: " + bm.getTitle());
-		Bukkit.broadcastMessage("Author: " + bm.getAuthor());
-		Bukkit.broadcastMessage("Display Name: " + bm.getDisplayName());
 	}
 }

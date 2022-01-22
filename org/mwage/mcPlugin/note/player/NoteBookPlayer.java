@@ -2,7 +2,7 @@ package org.mwage.mcPlugin.note.player;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.mwage.mcPlugin.note.NoteBook;
+import org.mwage.mcPlugin.note.standard.NoteBook;
 public class NoteBookPlayer extends NoteBook<UUID> {
 	public final String author;
 	public final String title;
@@ -13,7 +13,7 @@ public class NoteBookPlayer extends NoteBook<UUID> {
 		String author = "null", title = "null";
 		if(targetPlayer != null) {
 			author = targetPlayer.getName();
-			title = author;
+			title = "Note about player: " + author;
 		}
 		this.author = author;
 		this.title = title;

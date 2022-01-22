@@ -1,10 +1,14 @@
 package org.mwage.mcPlugin.note.player;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.mwage.mcPlugin.note.AbstractCommandProcessor;
 import org.mwage.mcPlugin.note.Main;
@@ -20,6 +24,9 @@ public class NotePlayerProcessor extends AbstractCommandProcessor {
 		super(plugin);
 		plugin.registerCommandProcessor(this);
 		noteBookPlayerSystem = new NoteBookPlayerSystem(plugin);
+	}
+	public void onDisable() {
+		noteBookPlayerSystem.onDisable();
 	}
 	@SuppressWarnings("deprecation")
 	@Override
@@ -106,7 +113,7 @@ public class NotePlayerProcessor extends AbstractCommandProcessor {
 						senderPlayer.sendMessage(message);
 						return true;
 					}
-					NoteBookPlayer noteBookPlayer = noteBookPlayerSystem.getNoteBook(targetPlayer, true);
+					NoteBookPlayer noteBookPlayer = noteBookPlayerSystem.readyNoteBook(targetPlayer, true);
 					switch(type) {
 						case READ :
 							int startPage = 1;
@@ -117,8 +124,9 @@ public class NotePlayerProcessor extends AbstractCommandProcessor {
 								}
 								catch(Exception e) {}
 							}
-							noteBookPlayer.playerReadNotes(senderPlayer, startPage);
-							senderPlayer.sendMessage("to read note: " + noteBookPlayer.getTitle());
+							senderPlayer.openBook(noteBookPlayer.getWrittenBookItem(startPage));
+							senderPlayer.sendMessage("Executed: to read note: " + noteBookPlayer.getTitle());
+							playerCommandSuccessful(senderPlayer);
 							return true;
 						case WRITE :
 							PlayerInventory inventory = senderPlayer.getInventory();
@@ -126,17 +134,31 @@ public class NotePlayerProcessor extends AbstractCommandProcessor {
 								senderPlayer.sendMessage("Exception: You must have an empty main hand to write a new note!");
 								return true;
 							}
-							noteBookPlayerSystem.playerStartEditing(senderPlayer, targetPlayer.getUniqueId());
-							noteBookPlayer.playerWriteNotes(senderPlayer);
-							senderPlayer.sendMessage("to write note: " + noteBookPlayer.getTitle());
+							noteBookPlayerSystem.playerStartWriting(senderPlayer, targetPlayer.getUniqueId());
+							ItemStack bookItem = noteBookPlayer.getWritableBookItem(senderPlayer);
+							inventory.setItemInMainHand(bookItem);
+							senderPlayer.sendMessage("Executed: to write note: " + noteBookPlayer.getTitle());
+							playerCommandSuccessful(senderPlayer);
 							return true;
 						case REMOVE :
-							noteBookPlayer.playerRemoveNotes(senderPlayer);
-							senderPlayer.sendMessage("to remove note: " + noteBookPlayer.getTitle());
+							senderPlayer.sendMessage("Executed: to remove note: " + noteBookPlayer.getTitle());
+							if(noteBookPlayer.removeNote(senderPlayer)) {
+								senderPlayer.sendMessage("Executed: 1 of your note removed.");
+							}
+							else {
+								senderPlayer.sendMessage("Executed: you did not have notes in this note book.");
+							}
+							playerCommandSuccessful(senderPlayer);
 							return true;
 						case RECOVER :
-							noteBookPlayer.playerRecoverNotes(senderPlayer);
-							senderPlayer.sendMessage("to recover note: " + noteBookPlayer.getTitle());
+							senderPlayer.sendMessage("Executed: to recover note: " + noteBookPlayer.getTitle());
+							if(noteBookPlayer.recoverNote(senderPlayer)) {
+								senderPlayer.sendMessage("Executed: 1 removed note recovered.");
+							}
+							else {
+								senderPlayer.sendMessage("Executed: you did not have notes to recover.");
+							}
+							playerCommandSuccessful(senderPlayer);
 							return true;
 					}
 				}
@@ -153,5 +175,8 @@ public class NotePlayerProcessor extends AbstractCommandProcessor {
 	public String getCommand() {
 		return "note-player";
 	}
-	protected void playerReadPlayerNoteBook(Player reader, Player target) {}
+	private void playerCommandSuccessful(Player player) {
+		Location location = player.getLocation();
+		player.playSound(location, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 0.8f, 1.2f);;
+	}
 }
