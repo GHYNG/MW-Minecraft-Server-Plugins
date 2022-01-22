@@ -1,0 +1,18 @@
+name: MW_Vote
+version: Paper-1.17.1-MW-1
+description: Milkyway noting system.
+author: GHYNG
+main: org.mwage.mcPlugin.note.Main
+depend: [MW_Plugin_Main]
+api-version: 1.16
+
+commands:
+  note-player:
+    description: Make note on a player.
+    usage: Use /note-player read <player-id> to read. Use /note-player write <player-id> to write.
+    permission: mw_note.note-player
+    
+permissions:
+  mw_note.note-player: 
+    description: Allows managers to read and write notes on players.
+    default: op
