@@ -1,6 +1,6 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
-public class DoubleValueParser extends MetaValueParser<DoubleValue> {
-	public DoubleValueParser() {
+public class DoubleValueProcessor extends MetaValueProcessor<DoubleValue> {
+	public DoubleValueProcessor() {
 		super(StaticData.DOUBLE_TYPE_NAME);
 	}
 	@Override

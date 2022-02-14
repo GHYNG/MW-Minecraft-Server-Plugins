@@ -55,6 +55,42 @@ public interface CollectionValue<E, A, SE, SA, S extends Value<SE, SA>> extends 
 	default Value<?, ?> getInnerValueWithLongKey(String key) {
 		return calculateLongKey(key);
 	}
+	default boolean directlyContains(S innerValue) {
+		return directlyContains(innerValue, true);
+	}
+	default boolean directlyContains(S lookfor, boolean useEquals) {
+		if(lookfor == null) {
+			return false;
+		}
+		Set<S> innerValues = getAllDirectlyInnerValues();
+		if(useEquals && innerValues.contains(lookfor)) {
+			return true;
+		}
+		for(S innerValue : innerValues) {
+			if(lookfor == innerValue) {
+				return true;
+			}
+		}
+		return false;
+	}
+	default boolean contains(Value<?, ?> lookfor) {
+		return contains(lookfor, true);
+	}
+	default boolean contains(Value<?, ?> lookfor, boolean useEquals) {
+		if(lookfor == null) {
+			return false;
+		}
+		Set<Value<?, ?>> innerValues = getAllInnerValues();
+		if(useEquals && innerValues.contains(lookfor)) {
+			return true;
+		}
+		for(Value<?, ?> innerValue : innerValues) {
+			if(lookfor == innerValue) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
 @SuppressWarnings({
 		"unused", "rawtypes"

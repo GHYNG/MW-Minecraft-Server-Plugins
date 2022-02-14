@@ -1,6 +1,8 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypeHeader;
 import org.mwage.mcPlugin.main.util.clazz.GenericTypesInfo;
 @GenericTypeHeader(superClass = Value.class, typeParamaterName = "E", typeParamater = Map.class)
@@ -9,6 +11,15 @@ public interface ExpressiveTableValue<A, SE, SA, S extends Value<SE, SA>> extend
 	@Override
 	default Class<Map<String, S>> getClassE() {
 		return (Class<Map<String, S>>)new HashMap<String, S>().getClass();
+	}
+	@Override
+	default Set<S> getAllDirectlyInnerValues() {
+		Map<String, S> map = getInstanceE();
+		Set<S> set = new HashSet<S>();
+		map.keySet().forEach(key -> {
+			set.add(map.get(key));
+		});
+		return set;
 	}
 	@Override
 	default S getDirectlyInnerValue(String key) {

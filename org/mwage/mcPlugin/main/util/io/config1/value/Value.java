@@ -31,6 +31,8 @@ public interface Value<E, A> extends GenericTypesInfoble<Value<E, A>> {
 		}
 		return info;
 	}
+	// TODO this needs to be added
+	// ValueGenerator<E, A, ? extends Value<E, A>> getGenerator();
 	CollectionValue<?, ?, ?, ?, ? extends Value<?, ?>> getOuterValue();
 	default CollectionValue<?, ?, ?, ?, ? extends Value<?, ?>> getOutestValue() {
 		if(this instanceof CollectionValue<?, ?, ?, ?, ?> container) {
@@ -46,11 +48,9 @@ public interface Value<E, A> extends GenericTypesInfoble<Value<E, A>> {
 	}
 	String getTypeName();
 	default Value<?, ?> calculateKey(String key) {
-		MethodHeader header = new MethodHeader(getTypeName(), key);
-		Function<Value<?, ?>, Value<?, ?>> method = value_methods.get(header);
-		if(method != null) {
-			return method.invoke(this);
-		}
+		// ValueGenerator<E, A, ? extends Value<E, A>> valueGenerator = getGenerator();
+		// Function<? extends Value<E, A>, Value<?, ?>> method = valueGenerator.getMethods().get(key);
+		// Value<?, ?> result = method.invoke(this);
 		return null;
 	}
 	default Value<?, ?> calculateKeys(String... keys) {
@@ -71,10 +71,5 @@ public interface Value<E, A> extends GenericTypesInfoble<Value<E, A>> {
 	default Value<?, ?> calculateLongKey(String key) {
 		String[] keys = key.split("\\.");
 		return calculateKeys(keys);
-	}
-	record MethodHeader(String typeName, String methodName) {}
-	static Map<MethodHeader, Function<Value<?, ?>, Value<?, ?>>> value_methods = new HashMap<MethodHeader, Function<Value<?, ?>, Value<?, ?>>>();
-	static void registerValueMethod(MethodHeader methodHeader, Function<Value<?, ?>, Value<?, ?>> method) {
-		value_methods.put(methodHeader, method);
 	}
 }

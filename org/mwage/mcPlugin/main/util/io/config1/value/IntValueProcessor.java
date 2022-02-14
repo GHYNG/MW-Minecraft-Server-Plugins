@@ -1,6 +1,6 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
-public class IntValueParser extends MetaValueParser<IntValue> {
-	public IntValueParser() {
+public class IntValueProcessor extends MetaValueProcessor<IntValue> {
+	public IntValueProcessor() {
 		super(StaticData.INT_TYPE_NAME);
 	}
 	@Override

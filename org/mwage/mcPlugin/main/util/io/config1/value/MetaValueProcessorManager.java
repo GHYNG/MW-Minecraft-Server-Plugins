@@ -1,18 +1,18 @@
 package org.mwage.mcPlugin.main.util.io.config1.value;
 import java.util.ArrayList;
 import java.util.List;
-public class MetaValueParserManager {
-	protected final List<MetaValueParser<?>> parsers = new ArrayList<MetaValueParser<?>>();
-	public void registerParser(MetaValueParser<?> parser) {
+public class MetaValueProcessorManager {
+	protected final List<MetaValueProcessor<?>> parsers = new ArrayList<MetaValueProcessor<?>>();
+	public void registerParser(MetaValueProcessor<?> parser) {
 		parsers.add(parser);
 	}
-	public void unregisterParser(MetaValueParser<?> parser) {
+	public void unregisterParser(MetaValueProcessor<?> parser) {
 		while(parsers.contains(parser)) {
 			parsers.remove(parser);
 		}
 	}
 	public boolean parsable(String content) {
-		for(MetaValueParser<?> parser : parsers) {
+		for(MetaValueProcessor<?> parser : parsers) {
 			if(parser.parsable(content)) {
 				return true;
 			}
@@ -25,7 +25,7 @@ public class MetaValueParserManager {
 	public MetaValue<?, ?> parse(CollectionValue<?, ?, ?, ?, ?> containingValue, String typeName, String content) {
 		int size = parsers.size();
 		for(int i = size - 1; i >= 0; i--) {
-			MetaValueParser<?> parser = parsers.get(i);
+			MetaValueProcessor<?> parser = parsers.get(i);
 			if(parser.typeName.equals(typeName) && parser.parsable(content)) {
 				MetaValue<?, ?> value = parser.parse(containingValue, content);
 				return value;
