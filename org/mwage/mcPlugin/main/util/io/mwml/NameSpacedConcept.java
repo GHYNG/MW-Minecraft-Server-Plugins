@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.mwage.mcPlugin.main.util.methods.LogicUtil;
-public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implements Comparable<NameSpacedConcept<C>>, LogicUtil {
+import org.mwage.mcPlugin.main.util.methods.StringUtil;
+public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implements Comparable<NameSpacedConcept<C>>, LogicUtil, StringUtil {
 	public static record Signature(String moduleName, List<String> packageNames, String name) {
 		public Signature(String moduleName, String name, String... packageNames) {
 			this(moduleName, new ArrayList<String>(), name);
@@ -20,14 +21,14 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 		}
 		return new Signature(moduleName, packageNames, name);
 	}
-	public final Module markupLanguageSpace;
-	protected final String moduleName;
+	private String description;
+	public final String moduleName;
 	protected final List<String> packageNames = new ArrayList<String>();
-	protected final String name;
+	public final String name;
 	private Set<NameSpacedConcept<C>> parents = new HashSet<NameSpacedConcept<C>>();
 	private Set<NameSpacedConcept<C>> children = new HashSet<NameSpacedConcept<C>>();
-	public NameSpacedConcept(Module module, String moduleName, List<String> packageNames, String name) {
-		this.markupLanguageSpace = module;
+	public NameSpacedConcept(String moduleName, List<String> packageNames, String name) {
+		// this.localModule = module;
 		if(!ParserSystem.isLegalIdentifier(moduleName) && (!moduleName.equals(""))) {
 			throw new IdentifierFormatException("Given moduleName: \"" + moduleName + "\" is not legal for an identifier");
 		}
@@ -42,12 +43,15 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 			}
 			this.packageNames.add(packageName);
 		}
+		initDefaultDescrption();
 	}
-	public NameSpacedConcept(Module markupLanguageSpace, Signature signature) {
-		this(markupLanguageSpace, signature.moduleName, signature.packageNames, signature.name);
+	public NameSpacedConcept(Signature signature) {
+		this(signature.moduleName, signature.packageNames, signature.name);
 	}
-	@Override
-	public String toString() {
+	private void initDefaultDescrption() {
+		List<String> lines = new ArrayList<String>();
+		lines.add("There is no description for this type by author, below is a default description generated:");
+		lines.add("Module: `" + moduleName + "`");
 		String longPackageName = "";
 		int packageNamesSize = packageNames.size();
 		if(packageNamesSize != 0) {
@@ -56,11 +60,27 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 			}
 			longPackageName += packageNames.get(packageNamesSize - 1);
 		}
-		if(moduleName.equals("") || moduleName.equals(markupLanguageSpace.getName())) {
+		lines.add("Package: `" + longPackageName + "`");
+		lines.add("Type: `" + name + "`");
+		lines.add("End default description.");
+		description = page(lines);
+	}
+	@Override
+	public String toString() {
+		// TODO this method needs to be improved
+		String longPackageName = "";
+		int packageNamesSize = packageNames.size();
+		if(packageNamesSize != 0) {
+			for(int i = 0; i < packageNamesSize - 1; i++) {
+				longPackageName += packageNames.get(i) + ".";
+			}
+			longPackageName += packageNames.get(packageNamesSize - 1);
+		}
+		if(moduleName == null || moduleName.equals("")/* || moduleName.equals(localModule.getName()) */) {
 			if(packageNames.size() == 0) {
 				return name;
 			}
-			return longPackageName + ":";
+			return longPackageName + ":" + name;
 		}
 		return moduleName + ":" + longPackageName + ":" + name;
 	}
@@ -76,8 +96,8 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 		if(another == null) {
 			return false;
 		}
-		if(another instanceof ValueType at) {
-			return toString().equals(at.toString());
+		if(another instanceof NameSpacedConcept<?> nc) {
+			return this.getSignature().equals(nc.getSignature());
 		}
 		return false;
 	}
@@ -131,6 +151,20 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 		}
 		return 0;
 	}
+	public int getTier() {
+		int tier = 0;
+		for(NameSpacedConcept<C> parent : parents) {
+			tier += parent.getTier() + 1;
+		}
+		return tier;
+	}
+	public List<String> getPackageNames() {
+		List<String> result = new ArrayList<String>();
+		for(String packageName : packageNames) {
+			result.add(packageName);
+		}
+		return result;
+	}
 	public boolean hasParent(NameSpacedConcept<C> another) {
 		if(another == null) {
 			return false;
@@ -148,6 +182,23 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 		}
 		return false;
 	}
+	public boolean hasParent(Signature anotherSignature) {
+		if(anotherSignature == null) {
+			return false;
+		}
+		if(this.getSignature().equals(anotherSignature)) {
+			return true;
+		}
+		for(NameSpacedConcept<C> parent : parents) {
+			if(parent.getSignature().equals(anotherSignature)) {
+				return true;
+			}
+			if(parent.hasParent(anotherSignature)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public boolean hasChild(NameSpacedConcept<C> another) {
 		if(another == null) {
 			return false;
@@ -160,6 +211,23 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 		}
 		for(NameSpacedConcept<C> child : children) {
 			if(child.hasChild(another)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean hasChild(Signature anotherSignature) {
+		if(anotherSignature == null) {
+			return false;
+		}
+		if(this.getSignature().equals(anotherSignature)) {
+			return true;
+		}
+		for(NameSpacedConcept<C> child : children) {
+			if(child.getSignature().equals(anotherSignature)) {
+				return true;
+			}
+			if(child.hasChild(anotherSignature)) {
 				return true;
 			}
 		}
@@ -192,5 +260,11 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 		this.children.add(another);
 		another.parents.add(this);
 		return true;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

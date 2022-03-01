@@ -1,29 +1,31 @@
 package org.mwage.mcPlugin.main.util.io.mwml;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.mwage.mcPlugin.main.util.io.mwml.NameSpacedConcept.Signature;
 import org.mwage.mcPlugin.main.util.io.mwml.parser.Parser;
-import org.mwage.mcPlugin.main.util.io.mwml.parser.expressive.ExpressivePrimaryParser;
-import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.ExpressivePrimaryValue;
-public class ParserSystem {
-	public final Module localModule;
+import org.mwage.mcPlugin.main.util.io.mwml.value.Value;
+import org.mwage.mcPlugin.main.util.methods.LogicUtil;
+public class ParserSystem implements LogicUtil {
+	public final MWMLModule localModule;
 	private final Set<Parser<?, ?, ?>> localParsers = new HashSet<Parser<?, ?, ?>>();
-	public ParserSystem(Module localModule) {
+	public ParserSystem(MWMLModule localModule) {
 		this.localModule = localModule;
 	}
 	public final Set<Parser<?, ?, ?>> getParsersFromAllParentModules() {
 		Set<Parser<?, ?, ?>> parentParsers = new HashSet<Parser<?, ?, ?>>();
-		Set<Module> parentModules = localModule.getAllParents();
-		for(Module parentModule : parentModules) {
+		Set<MWMLModule> parentModules = localModule.getAllParents();
+		for(MWMLModule parentModule : parentModules) {
 			parentParsers.addAll(parentModule.getParserSystem().localParsers);
 		}
 		return parentParsers;
 	}
 	public final Set<Parser<?, ?, ?>> getParsersFromAllChildModules() {
 		Set<Parser<?, ?, ?>> childParsers = new HashSet<Parser<?, ?, ?>>();
-		Set<Module> childModules = localModule.getAllChildren();
-		for(Module childModule : childModules) {
+		Set<MWMLModule> childModules = localModule.getAllChildren();
+		for(MWMLModule childModule : childModules) {
 			childParsers.addAll(childModule.getParserSystem().localParsers);
 		}
 		return childParsers;
@@ -35,44 +37,92 @@ public class ParserSystem {
 		parsers.addAll(getParsersFromAllChildModules());
 		return parsers;
 	}
-	public ExpressivePrimaryValue<?, ?> parseFromPrimaryExpression(Signature typeSignature, String expression) {
-		Set<ExpressivePrimaryValue<?, ?>> parsedExpressivePrimaryValues = new HashSet<ExpressivePrimaryValue<?, ?>>();
+	protected Set<Value<?, ?>> parsePossibleValuesFromPureExpression(File file, int lineNumber, Signature valueSignature, Signature expressionSignature, String expression) {
+		Set<Value<?, ?>> parsedValues = new HashSet<Value<?, ?>>();
 		for(Parser<?, ?, ?> parser : getAllParsers()) {
-			if(parser instanceof ExpressivePrimaryParser<?, ?, ?> expressivePrimaryParser) {
-				ValueType valueType = expressivePrimaryParser.getValueType();
-				if(valueType.getSignature().equals(typeSignature)) {
-					try {
-						ExpressivePrimaryValue<?, ?> expressivePrimaryValue = expressivePrimaryParser.parseFromPrimaryExpression(expression);
-						if(expressivePrimaryValue != null) {
-							parsedExpressivePrimaryValues.add(expressivePrimaryValue);
-						}
+			ValueType valueType = parser.getValueType();
+			ExpressionType expressionType = parser.getExpressionType();
+			if(valueType.hasParent(valueSignature) && expressionType.hasParent(expressionSignature)) {
+				try {
+					Value<?, ?> parsedValue = parser.parseFromPureExpression(valueSignature, expressionSignature, expression);
+					if(parsedValue != null) {
+						parsedValues.add(parsedValue);
 					}
-					catch(Exception e) {}
+				}
+				catch(Exception e) {
+					List<String> message = new ArrayList<String>();
+					try {
+						// localModule.getLogger().warning("The parser with value type: " + valueSignature + " and expression type: " + expressionSignature);
+					}
+					catch(UnsupportedOperationException e1) {}
 				}
 			}
 		}
-		if(parsedExpressivePrimaryValues.size() != 0) {
-			return null; // TODO unfinished
-		}
-		return null; // this should return null, because no value is parsed successfully
+		return parsedValues;
 	}
-	public ExpressivePrimaryValue<?, ?> parseFromPrimaryExpression(String actualTypeProjectName, List<String> actualTypePackageNames, String actualTypeName, String expression) {
-		for(Parser<?, ?, ?> valueParser : localParsers) {
-			if(valueParser instanceof ExpressivePrimaryParser<?, ?, ?> expressivePrimaryValueParser) {
-				ValueType actualType = expressivePrimaryValueParser.getValueType();
-				ValueType imaginaryActualType = new ValueType(localModule, actualTypeProjectName, actualTypePackageNames, actualTypeName);
-				if(actualType.equals(imaginaryActualType)) {
-					try {
-						ExpressivePrimaryValue<?, ?> expressivePrimaryValue = expressivePrimaryValueParser.parseFromPrimaryExpression(expression);
-						if(expressivePrimaryValue != null) {
-							return expressivePrimaryValue; // See end of this method
+	/*
+	 * This method could still be improved
+	 */
+	protected Value<?, ?> selectValue(Signature valueSignature, Signature expressionSignature, Set<Value<?, ?>> values) {
+		// TODO the order should be rearranged
+		Value<?, ?> selectedValue = null;
+		Parser<?, ?, ?> selectedParser = null;
+		MWMLModule selectedModule = null;
+		int selectedPriority = Integer.MIN_VALUE;
+		for(Value<?, ?> value : values) {
+			if(value.getParser().getValueType().getSignature().equals(valueSignature) && value.getParser().getExpressionType().getSignature().equals(expressionSignature)) {
+				return value;
+			}
+			if(selectedValue == null) {
+				selectedValue = value;
+				selectedParser = selectedValue.getParser();
+				selectedModule = selectedParser.getModule();
+				selectedPriority = selectedParser.getPriority();
+				continue;
+			}
+			Parser<?, ?, ?> parser = value.getParser();
+			int priority = parser.getPriority();
+			MWMLModule module = parser.getModule();
+			if(and(selectedParser.getModule() != localModule, module == localModule)) {
+				selectedValue = value;
+				selectedParser = selectedValue.getParser();
+				selectedModule = selectedParser.getModule();
+				selectedPriority = selectedParser.getPriority();
+				continue;
+			}
+			if(or(selectedModule != localModule, and(module == localModule, selectedModule == localModule))) {
+				if(priority > selectedPriority) {
+					selectedValue = value;
+					selectedParser = selectedValue.getParser();
+					selectedModule = selectedParser.getModule();
+					selectedPriority = selectedParser.getPriority();
+					continue;
+				}
+				if(priority == selectedPriority) {
+					if(module.getTier() < selectedModule.getTier()) {
+						selectedValue = value;
+						selectedParser = selectedValue.getParser();
+						selectedModule = selectedParser.getModule();
+						selectedPriority = selectedParser.getPriority();
+						continue;
+					}
+					if(module.getTier() == selectedModule.getTier()) {
+						if(parser.getValueType().getTier() * parser.getExpressionType().getTier() < selectedParser.getValueType().getTier() * selectedParser.getExpressionType().getTier()) {
+							selectedValue = value;
+							selectedParser = selectedValue.getParser();
+							selectedModule = selectedParser.getModule();
+							selectedPriority = selectedParser.getPriority();
+							continue;
 						}
 					}
-					catch(RuntimeException e) {}
 				}
 			}
 		}
-		return null; // If any kind of Error Value Type is implemented, then null should not be used
+		return selectedValue;
+	}
+	public Value<?, ?> parseFromPureExpression(File file, int lineNumber, Signature valueSignature, Signature expressionSignature, String expression) {
+		Set<Value<?, ?>> values = parsePossibleValuesFromPureExpression(file, lineNumber, valueSignature, expressionSignature, expression);
+		return selectValue(valueSignature, expressionSignature, values);
 	}
 	/*
 	 * This method only tests if the given identifier is legal grammaly.
