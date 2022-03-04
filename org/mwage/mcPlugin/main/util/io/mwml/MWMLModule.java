@@ -103,6 +103,24 @@ public interface MWMLModule {
 		}
 		return allChildren;
 	}
+	default Set<MWMLModule> getAllModules() {
+		Set<MWMLModule> modules = new HashSet<MWMLModule>();
+		modules.add(this);
+		modules.addAll(getAllParents());
+		modules.addAll(getAllChildren());
+		return modules;
+	}
+	default MWMLModule findModule(String name) {
+		if(name == null) {
+			return null;
+		}
+		for(MWMLModule module : getAllModules()) {
+			if(name.equals(module.getName())) {
+				return module;
+			}
+		}
+		return null;
+	}
 	default Set<ValueType> getAllValueTypes() {
 		Set<ValueType> allValueTypes = new HashSet<ValueType>();
 		allValueTypes.addAll(getLocalValueTypes());
@@ -132,7 +150,7 @@ public interface MWMLModule {
 		if(getLocalValueTypes().contains(valueType)) {
 			return false;
 		}
-		if(!valueType.moduleName.equals(getName())) {
+		if(!valueType.getSignature().moduleNames().toString().equals(getName())) {
 			return false;
 		}
 		return getLocalValueTypes().add(valueType);
@@ -144,7 +162,7 @@ public interface MWMLModule {
 		if(getLocalExpressionTypes().contains(expressionType)) {
 			return false;
 		}
-		if(!expressionType.moduleName.equals(getName())) {
+		if(!expressionType.getSignature().moduleNames().toString().equals(getName())) {
 			return false;
 		}
 		return getLocalExpressionTypes().add(expressionType);

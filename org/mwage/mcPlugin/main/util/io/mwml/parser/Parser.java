@@ -9,24 +9,33 @@ public interface Parser<E, A, V extends Value<E, A>> {
 		return 0;
 	}
 	MWMLModule MODULE = MWMLModule.CORE_MODULE;
-	default MWMLModule getModule() {
+	default MWMLModule getDefinerModule() {
 		return MODULE;
 	}
-	Signature getValueSignature();
-	Signature getExpressionSignature();
+	Signature VALUE_SIGNATURE = new Signature("", "", "value");
+	Signature EXPRESSION_SIGNATURE = new Signature("", "", "expression");
+	default Signature getValueSignature() {
+		return VALUE_SIGNATURE;
+	}
+	default Signature getExpressionSignature() {
+		return EXPRESSION_SIGNATURE;
+	}
 	default ValueType getValueType() {
-		return getModule().findValueType(getValueSignature());
+		return getDefinerModule().findValueType(getValueSignature());
 	}
 	default ExpressionType getExpressionType() {
-		return getModule().findExpressionType(getExpressionSignature());
+		return getDefinerModule().findExpressionType(getExpressionSignature());
 	}
 	/*
 	 * Notice that the valueSignature and expressionSignature parameters in the 2 methods below is necessary.
 	 * Because they are the actual signature found from the file,
 	 * instead of the ideal signatures from getValueSignature() and getExpressionSignature()
 	 */
-	V parseFromActualInstance(Signature valueSignature, Signature expressionSignature, A actualInstance);
-	V parseFromPureExpression(Signature valueSignature, Signature expressionSignature, String expression);
+	V parseFromActualInstance(MWMLModule invokerModule, Signature valueSignature, Signature expressionSignature, A actualInstance);
+	V parseValue(MWMLModule invokerModule, Signature valueSignature, Signature expressionSignature, String expression);
+	default V parseValue(MWMLModule invokerModule, String expression) {
+		return parseValue(invokerModule, getValueSignature(), getExpressionSignature(), expression);
+	}
 	boolean canTransform(Value<?, ?> another);
 	V tryTransform(Value<?, ?> another);
 }

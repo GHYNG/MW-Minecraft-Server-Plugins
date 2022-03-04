@@ -2,9 +2,15 @@ package org.mwage.mcPlugin.main.util.io.mwml.parser.expressive;
 import java.util.HashMap;
 import java.util.Map;
 import org.mwage.mcPlugin.main.util.io.mwml.StringFormatException;
+import org.mwage.mcPlugin.main.util.io.mwml.NameSpacedConcept.Signature;
 import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.ExpressiveStringValue;
 import org.mwage.mcPlugin.main.util.methods.LogicUtil;
 public interface ExpressiveStringParser<A> extends ExpressivePrimaryParser<String, A, ExpressiveStringValue<A>>, LogicUtil {
+	Signature EXPRESSION_SIGNATURE = new Signature("", "", "string");
+	@Override
+	default Signature getExpressionSignature() {
+		return EXPRESSION_SIGNATURE;
+	}
 	@Override
 	default String parseExpressiveInstanceFromPrimaryExpression(String expression) {
 		if(not(and(expression.startsWith("\""), expression.endsWith("\"")))) {

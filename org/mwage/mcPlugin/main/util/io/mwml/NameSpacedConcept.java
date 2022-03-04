@@ -3,86 +3,239 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.mwage.mcPlugin.main.util.MWCloneable;
 import org.mwage.mcPlugin.main.util.methods.LogicUtil;
 import org.mwage.mcPlugin.main.util.methods.StringUtil;
 public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implements Comparable<NameSpacedConcept<C>>, LogicUtil, StringUtil {
-	public static record Signature(String moduleName, List<String> packageNames, String name) {
-		public Signature(String moduleName, String name, String... packageNames) {
-			this(moduleName, new ArrayList<String>(), name);
-			for(String packageName : packageNames) {
-				this.packageNames.add(packageName);
+	public static record Signature(NamePath moduleNames, NamePath packageNames, String name) implements MWCloneable<Signature>, Comparable<Signature>, LogicUtil {
+		public Signature {
+			if(name == null) {
+				throw new NullPointerException("Parameter: name cannot be null.");
 			}
+			boolean moduleNull = false, packageNull = false;
+			if(moduleNames == null) {
+				moduleNames = new NamePath("");
+				moduleNull = true;
+			}
+			if(packageNames == null) {
+				packageNames = new NamePath("");
+				packageNull = true;
+			}
+			if(!moduleNull) {
+				moduleNames = moduleNames.clone();
+			}
+			if(!packageNull) {
+				packageNames = packageNames.clone();
+			}
+		}
+		public Signature(List<String> moduleNames, List<String> packageNames, String name) {
+			this(new NamePath(moduleNames), new NamePath(moduleNames), name);
+		}
+		public Signature(String moduleNames, String packageNames, String name) {
+			this(new ArrayList<String>(), new ArrayList<String>(), name);
+			if(moduleNames != null && (!moduleNames.equals(""))) {
+				String[] moduleNameParts = moduleNames.split("\\.");
+				for(String moduleNamePart : moduleNameParts) {
+					this.moduleNames.path.add(moduleNamePart);
+				}
+			}
+			if(packageNames != null && (!packageNames.equals(""))) {
+				String[] packageNameParts = packageNames.split("\\.");
+				for(String packageNamePart : packageNameParts) {
+					this.packageNames.path.add(packageNamePart);
+				}
+			}
+		}
+		public static Signature parseSignature(String completeName) throws NullPointerException, IllegalArgumentException, RuntimeException {
+			if(completeName == null) {
+				throw new NullPointerException("Complete name is null.");
+			}
+			if(completeName.length() == 0) {
+				throw new IllegalArgumentException("Complete name is empty.");
+			}
+			String[] parts = completeName.split("\\#");
+			int length = parts.length;
+			if(length == 0) {
+				throw new IllegalArgumentException("Cannot parse complete name: \"" + completeName + "\"");
+			}
+			if(length == 1) {
+				return new Signature("", "", completeName);
+			}
+			if(length == 2) {
+				String packagePart = parts[0];
+				String namePart = parts[1];
+				return new Signature("", packagePart, namePart);
+			}
+			if(length == 3) {
+				String modulePart = parts[0];
+				String packagePart = parts[1];
+				String namePart = parts[2];
+				return new Signature(modulePart, packagePart, namePart);
+			}
+			throw new IllegalArgumentException("Unknown exception occured while parsing signature with string: \"" + completeName + "\", maybe wrong syntax?");
+		}
+		@Override
+		public Signature clone() {
+			return new Signature(moduleNames, packageNames, name);
+		}
+		@Override
+		public int compareTo(Signature another) {
+			if(another == null) {
+				throw new NullPointerException("Null parameter.");
+			}
+			int compare = this.moduleNames.compareTo(another.moduleNames);
+			if(compare != 0) {
+				return compare;
+			}
+			compare = this.packageNames.compareTo(another.packageNames);
+			if(compare != 0) {
+				return compare;
+			}
+			return this.name.compareTo(another.name);
+		}
+		@Override
+		public String toString() {
+			if(moduleNames.isEmpty()) {
+				if(packageNames.isEmpty()) {
+					return name;
+				}
+				else {
+					return "" + packageNames + ":" + name;
+				}
+			}
+			else {
+				return "" + moduleNames + ":" + packageNames + ":" + name;
+			}
+		}
+	}
+	public static record NamePath(List<String> path) implements MWCloneable<NamePath>, Comparable<NamePath> {
+		public NamePath {
+			if(path == null) {
+				throw new NullPointerException("Null parameter.");
+			}
+			List<String> apath = new ArrayList<String>();
+			for(String name : path) {
+				apath.add(name);
+			}
+			path = apath;
+		}
+		public NamePath(String... pathNames) {
+			this(new ArrayList<String>());
+			for(String pathName : pathNames) {
+				if(!ParserSystem.isLegalIdentifier(pathName)) {
+					throw new IdentifierFormatException("Part of path names cannot be parsed: \"" + pathName + "\"");
+				}
+				path.add(pathName);
+			}
+		}
+		public NamePath(String longName) {
+			this(new ArrayList<String>());
+			if(longName == null || longName.equals("")) {
+				return;
+			}
+			String[] names = longName.split("\\.");
+			for(String name : names) {
+				if(!ParserSystem.isLegalIdentifier(name)) {
+					throw new IdentifierFormatException("Part of path names cannot be parsed: \"" + name + "\"");
+				}
+				path.add(name);
+			}
+		}
+		@Override
+		public NamePath clone() {
+			return new NamePath(path);
+		}
+		@Override
+		public int compareTo(NamePath another) {
+			if(another == null) {
+				throw new NullPointerException("Null Parameter.");
+			}
+			int asize = this.path.size(), bsize = another.path.size();
+			if(asize == 0 && bsize == 0) {
+				return 0;
+			}
+			if(this.toString().equals("") && another.toString().equals("")) {
+				return 0;
+			}
+			if(asize == 0 || this.toString().equals("")) {
+				return -1;
+			}
+			if(bsize == 0 || another.toString().equals("")) {
+				return 1;
+			}
+			for(int i = 0; i < asize && i < bsize; i++) {
+				String aname = this.path.get(i), bname = another.path.get(i);
+				int compare = aname.compareTo(bname);
+				if(compare != 0) {
+					return compare;
+				}
+				if(i == asize - 1 && i == bsize - 1) {
+					return 0;
+				}
+				if(i == asize - 1) {
+					return -1;
+				}
+				if(i == bsize - 1) {
+					return 1;
+				}
+			}
+			return 0;
+		}
+		@Override
+		public String toString() {
+			int size = path.size();
+			if(size == 0) {
+				return "";
+			}
+			String result = "";
+			for(int i = 0; i < size - 1; i++) {
+				result += path.get(i) + ".";
+			}
+			result += path.get(size - 1);
+			return result;
+		}
+		public boolean isEmpty() {
+			if(path == null) {
+				return true;
+			}
+			if(path.size() == 0) {
+				return true;
+			}
+			if(toString().equals("")) {
+				return true;
+			}
+			return false;
 		}
 	}
 	public Signature getSignature() {
-		List<String> packageNames = new ArrayList<String>();
-		for(String packageName : this.packageNames) {
-			packageNames.add(packageName);
-		}
-		return new Signature(moduleName, packageNames, name);
+		return signature.clone();
 	}
 	private String description;
-	public final String moduleName;
-	protected final List<String> packageNames = new ArrayList<String>();
-	public final String name;
+	private final Signature signature;
 	private Set<NameSpacedConcept<C>> parents = new HashSet<NameSpacedConcept<C>>();
 	private Set<NameSpacedConcept<C>> children = new HashSet<NameSpacedConcept<C>>();
-	public NameSpacedConcept(String moduleName, List<String> packageNames, String name) {
-		// this.localModule = module;
-		if(!ParserSystem.isLegalIdentifier(moduleName) && (!moduleName.equals(""))) {
-			throw new IdentifierFormatException("Given moduleName: \"" + moduleName + "\" is not legal for an identifier");
-		}
-		if(!ParserSystem.isLegalIdentifier(name)) {
-			throw new IdentifierFormatException("Given name: \"" + name + "\" is not legal for an identifier");
-		}
-		this.moduleName = moduleName;
-		this.name = name;
-		for(String packageName : packageNames) {
-			if(!ParserSystem.isLegalIdentifier(packageName)) {
-				throw new IdentifierFormatException("Given packageName: \"" + name + "\" is not legal for an identifier");
-			}
-			this.packageNames.add(packageName);
-		}
+	public NameSpacedConcept(Signature signature) {
+		this.signature = signature;
 		initDefaultDescrption();
 	}
-	public NameSpacedConcept(Signature signature) {
-		this(signature.moduleName, signature.packageNames, signature.name);
+	public NameSpacedConcept(NamePath moduleNames, NamePath packageNames, String name) {
+		this(new Signature(moduleNames, packageNames, name));
+	}
+	public NameSpacedConcept(List<String> moduleNames, List<String> packageNames, String name) {
+		this(new Signature(moduleNames, packageNames, name));
 	}
 	private void initDefaultDescrption() {
 		List<String> lines = new ArrayList<String>();
 		lines.add("There is no description for this type by author, below is a default description generated:");
-		lines.add("Module: `" + moduleName + "`");
-		String longPackageName = "";
-		int packageNamesSize = packageNames.size();
-		if(packageNamesSize != 0) {
-			for(int i = 0; i < packageNamesSize - 1; i++) {
-				longPackageName += packageNames.get(i) + ".";
-			}
-			longPackageName += packageNames.get(packageNamesSize - 1);
-		}
-		lines.add("Package: `" + longPackageName + "`");
-		lines.add("Type: `" + name + "`");
+		lines.add("Module: `" + signature.moduleNames + "`");
+		lines.add("Package: `" + signature.packageNames + "`");
+		lines.add("Type: `" + signature.name + "`");
 		lines.add("End default description.");
 		description = page(lines);
 	}
 	@Override
 	public String toString() {
-		// TODO this method needs to be improved
-		String longPackageName = "";
-		int packageNamesSize = packageNames.size();
-		if(packageNamesSize != 0) {
-			for(int i = 0; i < packageNamesSize - 1; i++) {
-				longPackageName += packageNames.get(i) + ".";
-			}
-			longPackageName += packageNames.get(packageNamesSize - 1);
-		}
-		if(moduleName == null || moduleName.equals("")/* || moduleName.equals(localModule.getName()) */) {
-			if(packageNames.size() == 0) {
-				return name;
-			}
-			return longPackageName + ":" + name;
-		}
-		return moduleName + ":" + longPackageName + ":" + name;
+		return signature.toString();
 	}
 	@Override
 	public int hashCode() {
@@ -106,50 +259,7 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 		if(another == null) {
 			throw new NullPointerException("NameSpacedConcept:another is null");
 		}
-		if(moduleName.equals("")) {
-			if(another.moduleName.equals("")) {
-				int packageLength = packageNames.size();
-				int anotherPackageLength = another.packageNames.size();
-				if(packageLength == 0) {
-					if(anotherPackageLength == 0) {
-						return name.compareTo(another.name);
-					}
-					else {
-						return -1;
-					}
-				}
-				else if(anotherPackageLength == 0) {
-					return 1;
-				}
-				else {
-					for(int i = 0; i < packageLength && i < anotherPackageLength; i++) {
-						int compare = packageNames.get(i).compareTo(another.packageNames.get(i));
-						if(compare != 0) {
-							return compare;
-						}
-						else {
-							if(i == packageLength - 1 && i == anotherPackageLength - 1) {
-								return 0;
-							}
-							else {
-								if(i == packageLength - 1) {
-									return -1;
-								}
-								if(i == anotherPackageLength - 1) {
-									return 1;
-								}
-								continue;
-							}
-						}
-					}
-					return 0;
-				}
-			}
-		}
-		else if(another.moduleName.equals("")) {
-			return 1;
-		}
-		return 0;
+		return this.signature.compareTo(another.signature);
 	}
 	public int getTier() {
 		int tier = 0;
@@ -157,13 +267,6 @@ public abstract class NameSpacedConcept<C extends NameSpacedConcept<C>> implemen
 			tier += parent.getTier() + 1;
 		}
 		return tier;
-	}
-	public List<String> getPackageNames() {
-		List<String> result = new ArrayList<String>();
-		for(String packageName : packageNames) {
-			result.add(packageName);
-		}
-		return result;
 	}
 	public boolean hasParent(NameSpacedConcept<C> another) {
 		if(another == null) {

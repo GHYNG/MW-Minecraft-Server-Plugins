@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.mwage.mcPlugin.main.util.io.mwml.NameSpacedConcept.Signature;
 import org.mwage.mcPlugin.main.util.io.mwml.parser.Parser;
 import org.mwage.mcPlugin.main.util.io.mwml.value.Value;
 import org.mwage.mcPlugin.main.util.methods.LogicUtil;
-public class ParserSystem implements LogicUtil {
+import org.mwage.mcPlugin.main.util.methods.StringUtil;
+/*
+ * This class is not completed yet. Improvements needed.
+ */
+public class ParserSystem implements LogicUtil, StringUtil {
 	public final MWMLModule localModule;
 	private final Set<Parser<?, ?, ?>> localParsers = new HashSet<Parser<?, ?, ?>>();
 	public ParserSystem(MWMLModule localModule) {
@@ -37,24 +42,35 @@ public class ParserSystem implements LogicUtil {
 		parsers.addAll(getParsersFromAllChildModules());
 		return parsers;
 	}
-	protected Set<Value<?, ?>> parsePossibleValuesFromPureExpression(File file, int lineNumber, Signature valueSignature, Signature expressionSignature, String expression) {
+	protected Set<Value<?, ?>> parsePossibleValuesFromPureExpression(File file, String location, Signature valueSignature, Signature expressionSignature, String expression) {
 		Set<Value<?, ?>> parsedValues = new HashSet<Value<?, ?>>();
 		for(Parser<?, ?, ?> parser : getAllParsers()) {
 			ValueType valueType = parser.getValueType();
 			ExpressionType expressionType = parser.getExpressionType();
 			if(valueType.hasParent(valueSignature) && expressionType.hasParent(expressionSignature)) {
 				try {
-					Value<?, ?> parsedValue = parser.parseFromPureExpression(valueSignature, expressionSignature, expression);
+					Value<?, ?> parsedValue = parser.parseValue(localModule, valueSignature, expressionSignature, expression);
 					if(parsedValue != null) {
 						parsedValues.add(parsedValue);
 					}
 				}
 				catch(Exception e) {
 					List<String> message = new ArrayList<String>();
+					String f = file.isFile() ? "file" : "folder";
+					message.add("Exception occured while parsing " + f + " at location: " + location);
+					message.add("This expression cannot be parsed successfully with given value and expression signatures: ");
+					message.add("Value Signature: " + valueSignature);
+					message.add("Expression Signature: " + expressionSignature);
 					try {
 						// localModule.getLogger().warning("The parser with value type: " + valueSignature + " and expression type: " + expressionSignature);
+						Logger logger = localModule.getLogger();
+						logger.warning(page(message));
 					}
-					catch(UnsupportedOperationException e1) {}
+					catch(UnsupportedOperationException e1) {
+						System.out.println("Error happened: Core MWML Module is trying to directly parse some values, and this should not happen!");
+						System.out.println("Or maybe something else happened with a module's logger system.");
+						System.out.println(page(message));
+					}
 				}
 			}
 		}
@@ -76,17 +92,17 @@ public class ParserSystem implements LogicUtil {
 			if(selectedValue == null) {
 				selectedValue = value;
 				selectedParser = selectedValue.getParser();
-				selectedModule = selectedParser.getModule();
+				selectedModule = selectedParser.getDefinerModule();
 				selectedPriority = selectedParser.getPriority();
 				continue;
 			}
 			Parser<?, ?, ?> parser = value.getParser();
 			int priority = parser.getPriority();
-			MWMLModule module = parser.getModule();
-			if(and(selectedParser.getModule() != localModule, module == localModule)) {
+			MWMLModule module = parser.getDefinerModule();
+			if(and(selectedParser.getDefinerModule() != localModule, module == localModule)) {
 				selectedValue = value;
 				selectedParser = selectedValue.getParser();
-				selectedModule = selectedParser.getModule();
+				selectedModule = selectedParser.getDefinerModule();
 				selectedPriority = selectedParser.getPriority();
 				continue;
 			}
@@ -94,7 +110,7 @@ public class ParserSystem implements LogicUtil {
 				if(priority > selectedPriority) {
 					selectedValue = value;
 					selectedParser = selectedValue.getParser();
-					selectedModule = selectedParser.getModule();
+					selectedModule = selectedParser.getDefinerModule();
 					selectedPriority = selectedParser.getPriority();
 					continue;
 				}
@@ -102,7 +118,7 @@ public class ParserSystem implements LogicUtil {
 					if(module.getTier() < selectedModule.getTier()) {
 						selectedValue = value;
 						selectedParser = selectedValue.getParser();
-						selectedModule = selectedParser.getModule();
+						selectedModule = selectedParser.getDefinerModule();
 						selectedPriority = selectedParser.getPriority();
 						continue;
 					}
@@ -110,7 +126,7 @@ public class ParserSystem implements LogicUtil {
 						if(parser.getValueType().getTier() * parser.getExpressionType().getTier() < selectedParser.getValueType().getTier() * selectedParser.getExpressionType().getTier()) {
 							selectedValue = value;
 							selectedParser = selectedValue.getParser();
-							selectedModule = selectedParser.getModule();
+							selectedModule = selectedParser.getDefinerModule();
 							selectedPriority = selectedParser.getPriority();
 							continue;
 						}
@@ -120,8 +136,8 @@ public class ParserSystem implements LogicUtil {
 		}
 		return selectedValue;
 	}
-	public Value<?, ?> parseFromPureExpression(File file, int lineNumber, Signature valueSignature, Signature expressionSignature, String expression) {
-		Set<Value<?, ?>> values = parsePossibleValuesFromPureExpression(file, lineNumber, valueSignature, expressionSignature, expression);
+	public Value<?, ?> parseFromPureExpression(File file, String location, Signature valueSignature, Signature expressionSignature, String expression) {
+		Set<Value<?, ?>> values = parsePossibleValuesFromPureExpression(file, location, valueSignature, expressionSignature, expression);
 		return selectValue(valueSignature, expressionSignature, values);
 	}
 	/*
