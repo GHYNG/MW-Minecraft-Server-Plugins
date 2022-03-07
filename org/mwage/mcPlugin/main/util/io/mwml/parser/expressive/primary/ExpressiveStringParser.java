@@ -1,0 +1,63 @@
+package org.mwage.mcPlugin.main.util.io.mwml.parser.expressive.primary;
+import java.util.HashMap;
+import java.util.Map;
+import org.mwage.mcPlugin.main.util.io.mwml.StringFormatException;
+import org.mwage.mcPlugin.main.util.io.mwml.NameSpacedConcept.Signature;
+import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.primary.ExpressiveStringValue;
+import org.mwage.mcPlugin.main.util.methods.LogicUtil;
+public interface ExpressiveStringParser<P extends ExpressiveStringParser<P, V, A>, V extends ExpressiveStringValue<V, P, A>, A> extends ExpressivePrimaryParser<P, V, String, A>, LogicUtil {
+	Signature EXPRESSION_SIGNATURE = new Signature("", "", "string");
+	@Override
+	default Signature getExpressionSignature() {
+		return EXPRESSION_SIGNATURE;
+	}
+	@Override
+	default String parseExpressiveInstanceFromExpression(String expression) {
+		if(not(and(expression.startsWith("\""), expression.endsWith("\"")))) {
+			throw new StringFormatException("Cannot parse: " + expression + ", maybe missing quote signs?");
+		}
+		int length = expression.length();
+		if(length < 3) {
+			throw new StringFormatException("Unknown error while parsing: " + expression + ", the expression is too short!");
+		}
+		String cuttedExpression = expression.substring(1, expression.length() - 1);
+		String expressiveInstance = ExpressiveStringParserUtil.parseEscapeString(cuttedExpression);
+		return expressiveInstance;
+	}
+}
+class ExpressiveStringParserUtil {
+	static Map<String, String> replacer = new HashMap<String, String>();
+	static {
+		replacer.put("t", "\t");
+		replacer.put("n", "\n");
+		replacer.put("\"", "\"");
+		replacer.put("\'", "\'");
+	}
+	static String parseEscapeString(String originalContent) {
+		String content = originalContent + "a";
+		String[] sectors = content.split("\\\\\\\\");
+		int length = sectors.length;
+		if(length == 0) {
+			return "";
+		}
+		for(int i = 0; i < length; i++) {
+			String sector = sectors[i];
+			for(String key : replacer.keySet()) {
+				String rep = replacer.get(key);
+				String bef = "\\\\" + key;
+				String aft = rep;
+				sector = sector.replaceAll(bef, aft);
+			}
+			if(sector.contains("\\")) {
+				return "Error!";
+			}
+			sectors[i] = sector;
+		}
+		content = "";
+		for(int i = 0; i < length - 1; i++) {
+			content += sectors[i] + "\\";
+		}
+		content += sectors[length - 1];
+		return content.substring(0, content.length() - 1);
+	}
+}

@@ -129,12 +129,12 @@ public class TreeMap<K, V> implements Main_GeneralMethods {
 	 *            子树。
 	 * @param keyChain
 	 *            下级节点地址。
-	 * @throws DeadLoopTreeException
+	 * @throws CircularRegistrationException
 	 *             不允许目标树作为本树的子树。
 	 */
 	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
 	@SuppressWarnings("unchecked")
-	public void putSubTree(TreeMap<K, V> subTree, K... keyChain) throws DeadLoopTreeException {
+	public void putSubTree(TreeMap<K, V> subTree, K... keyChain) throws CircularRegistrationException {
 		List<K> list = arrayToList(keyChain);
 		putSubTreeWithKeyChain(subTree, list);
 	}
@@ -147,23 +147,23 @@ public class TreeMap<K, V> implements Main_GeneralMethods {
 	 *            子树。
 	 * @param keyChain
 	 *            下级节点地址。
-	 * @throws DeadLoopTreeException
+	 * @throws CircularRegistrationException
 	 *             不允许目标树作为本树的子树。
 	 */
 	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
-	public void putSubTreeWithKeyChain(TreeMap<K, V> subTree, List<K> keyChain) throws DeadLoopTreeException {
+	public void putSubTreeWithKeyChain(TreeMap<K, V> subTree, List<K> keyChain) throws CircularRegistrationException {
 		if(keyChain == null) {
 			throw new NullPointerException("Paramater keyChain is null.");
 		}
 		int length = keyChain.size();
 		if(length == 0) {
-			throw new DeadLoopTreeException("Cannot put sub tree in same level. At least one sub level needed.");
+			throw new CircularRegistrationException("Cannot put sub tree in same level. At least one sub level needed.");
 		}
 		if(subTree.containsSubTree(this)) {
-			throw new DeadLoopTreeException("Cannot put parent tree in child tree.");
+			throw new CircularRegistrationException("Cannot put parent tree in child tree.");
 		}
 		if(this.containsSubTree(subTree)) {
-			throw new DeadLoopTreeException("Cannot put same child in parent tree more then once.");
+			throw new CircularRegistrationException("Cannot put same child in parent tree more then once.");
 		}
 		if(length == 1) {
 			K key = keyChain.get(0);

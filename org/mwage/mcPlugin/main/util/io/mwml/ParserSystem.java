@@ -12,44 +12,45 @@ import org.mwage.mcPlugin.main.util.methods.LogicUtil;
 import org.mwage.mcPlugin.main.util.methods.StringUtil;
 /*
  * This class is not completed yet. Improvements needed.
+ * Some of the methods are wrong. Rework needed.
  */
 public class ParserSystem implements LogicUtil, StringUtil {
 	public final MWMLModule localModule;
-	private final Set<Parser<?, ?, ?>> localParsers = new HashSet<Parser<?, ?, ?>>();
+	private final Set<Parser<?, ?, ?, ?>> localParsers = new HashSet<Parser<?, ?, ?, ?>>();
 	public ParserSystem(MWMLModule localModule) {
 		this.localModule = localModule;
 	}
-	public final Set<Parser<?, ?, ?>> getParsersFromAllParentModules() {
-		Set<Parser<?, ?, ?>> parentParsers = new HashSet<Parser<?, ?, ?>>();
+	public final Set<Parser<?, ?, ?, ?>> getParsersFromAllParentModules() {
+		Set<Parser<?, ?, ?, ?>> parentParsers = new HashSet<Parser<?, ?, ?, ?>>();
 		Set<MWMLModule> parentModules = localModule.getAllParents();
 		for(MWMLModule parentModule : parentModules) {
 			parentParsers.addAll(parentModule.getParserSystem().localParsers);
 		}
 		return parentParsers;
 	}
-	public final Set<Parser<?, ?, ?>> getParsersFromAllChildModules() {
-		Set<Parser<?, ?, ?>> childParsers = new HashSet<Parser<?, ?, ?>>();
+	public final Set<Parser<?, ?, ?, ?>> getParsersFromAllChildModules() {
+		Set<Parser<?, ?, ?, ?>> childParsers = new HashSet<Parser<?, ?, ?, ?>>();
 		Set<MWMLModule> childModules = localModule.getAllChildren();
 		for(MWMLModule childModule : childModules) {
 			childParsers.addAll(childModule.getParserSystem().localParsers);
 		}
 		return childParsers;
 	}
-	public final Set<Parser<?, ?, ?>> getAllParsers() {
-		Set<Parser<?, ?, ?>> parsers = new HashSet<Parser<?, ?, ?>>();
+	public final Set<Parser<?, ?, ?, ?>> getAllParsers() {
+		Set<Parser<?, ?, ?, ?>> parsers = new HashSet<Parser<?, ?, ?, ?>>();
 		parsers.addAll(getParsersFromAllParentModules());
 		parsers.addAll(localParsers);
 		parsers.addAll(getParsersFromAllChildModules());
 		return parsers;
 	}
-	protected Set<Value<?, ?>> parsePossibleValuesFromPureExpression(File file, String location, Signature valueSignature, Signature expressionSignature, String expression) {
-		Set<Value<?, ?>> parsedValues = new HashSet<Value<?, ?>>();
-		for(Parser<?, ?, ?> parser : getAllParsers()) {
+	protected Set<Value<?, ?, ?, ?>> parsePossibleValuesFromPureExpression(File file, String location, Signature valueSignature, Signature expressionSignature, String expression) {
+		Set<Value<?, ?, ?, ?>> parsedValues = new HashSet<Value<?, ?, ?, ?>>();
+		for(Parser<?, ?, ?, ?> parser : getAllParsers()) {
 			ValueType valueType = parser.getValueType();
 			ExpressionType expressionType = parser.getExpressionType();
 			if(valueType.hasParent(valueSignature) && expressionType.hasParent(expressionSignature)) {
 				try {
-					Value<?, ?> parsedValue = parser.parseValue(localModule, valueSignature, expressionSignature, expression);
+					Value<?, ?, ?, ?> parsedValue = parser.parseValue(localModule, valueSignature, expressionSignature, expression);
 					if(parsedValue != null) {
 						parsedValues.add(parsedValue);
 					}
@@ -79,13 +80,13 @@ public class ParserSystem implements LogicUtil, StringUtil {
 	/*
 	 * This method could still be improved
 	 */
-	protected Value<?, ?> selectValue(Signature valueSignature, Signature expressionSignature, Set<Value<?, ?>> values) {
+	protected Value<?, ?, ?, ?> selectValue(Signature valueSignature, Signature expressionSignature, Set<Value<?, ?, ?, ?>> values) {
 		// TODO the order should be rearranged
-		Value<?, ?> selectedValue = null;
-		Parser<?, ?, ?> selectedParser = null;
+		Value<?, ?, ?, ?> selectedValue = null;
+		Parser<?, ?, ?, ?> selectedParser = null;
 		MWMLModule selectedModule = null;
 		int selectedPriority = Integer.MIN_VALUE;
-		for(Value<?, ?> value : values) {
+		for(Value<?, ?, ?, ?> value : values) {
 			if(value.getParser().getValueType().getSignature().equals(valueSignature) && value.getParser().getExpressionType().getSignature().equals(expressionSignature)) {
 				return value;
 			}
@@ -96,7 +97,7 @@ public class ParserSystem implements LogicUtil, StringUtil {
 				selectedPriority = selectedParser.getPriority();
 				continue;
 			}
-			Parser<?, ?, ?> parser = value.getParser();
+			Parser<?, ?, ?, ?> parser = value.getParser();
 			int priority = parser.getPriority();
 			MWMLModule module = parser.getDefinerModule();
 			if(and(selectedParser.getDefinerModule() != localModule, module == localModule)) {
@@ -136,8 +137,8 @@ public class ParserSystem implements LogicUtil, StringUtil {
 		}
 		return selectedValue;
 	}
-	public Value<?, ?> parseFromPureExpression(File file, String location, Signature valueSignature, Signature expressionSignature, String expression) {
-		Set<Value<?, ?>> values = parsePossibleValuesFromPureExpression(file, location, valueSignature, expressionSignature, expression);
+	public Value<?, ?, ?, ?> parseFromPureExpression(File file, String location, Signature valueSignature, Signature expressionSignature, String expression) {
+		Set<Value<?, ?, ?, ?>> values = parsePossibleValuesFromPureExpression(file, location, valueSignature, expressionSignature, expression);
 		return selectValue(valueSignature, expressionSignature, values);
 	}
 	/*
