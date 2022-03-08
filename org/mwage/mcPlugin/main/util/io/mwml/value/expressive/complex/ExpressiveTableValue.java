@@ -1,12 +1,17 @@
 package org.mwage.mcPlugin.main.util.io.mwml.value.expressive.complex;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.mwage.mcPlugin.main.util.CircularRegistrationException;
 import org.mwage.mcPlugin.main.util.io.mwml.IdentifierFormatException;
+import org.mwage.mcPlugin.main.util.io.mwml.NameSpacedConcept.Signature;
 import org.mwage.mcPlugin.main.util.io.mwml.ParserSystem;
 import org.mwage.mcPlugin.main.util.io.mwml.parser.Parser;
 import org.mwage.mcPlugin.main.util.io.mwml.parser.expressive.complex.ExpressiveTableParser;
 import org.mwage.mcPlugin.main.util.io.mwml.value.Value;
 import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.primary.ExpressiveNullValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.primary.ExpressivePrimaryValue;
+import org.mwage.mcPlugin.main.util.methods.StringUtil;
 // @formatter:off
 public interface ExpressiveTableValue <
 	V extends ExpressiveTableValue <
@@ -49,14 +54,61 @@ public interface ExpressiveTableValue <
 			E_VP_A,
 	A
 > 
-extends ExpressiveComplexValue <
+extends 
+ExpressiveComplexValue <
 	V, 
 	P, 
 	E, 
 	A
->
+>, 
+StringUtil
 // @formatter:on
 {
+	@Override
+	default String toExpression() {
+		List<String> lines = new ArrayList<String>();
+		lines.add("list:{");
+		Map<String, E_V> map = getExpressiveInstance();
+		if(map.keySet().size() == 0) {
+			return "list:{}";
+		}
+		for(String key : map.keySet()) {
+			E_V innerValue = map.get(key);
+			if(innerValue == null) {
+				continue;
+			}
+			Signature usingValueSignature = innerValue.getUsingValueSignature();
+			Signature usingExpressionSignature = innerValue.getUsingExpressionSignature();
+			if(innerValue instanceof ExpressivePrimaryValue) {
+				String line = "" + usingValueSignature + " " + key + " = " + usingExpressionSignature + " " + innerValue.toExpression() + ";";
+				lines.add(line);
+				continue;
+			}
+			if(innerValue instanceof ExpressiveComplexValue) {
+				String innerExpression = innerValue.toExpression();
+				List<String> innerLines = separateByLine(innerExpression);
+				int length = innerLines.size();
+				if(length == 0) {
+					String line = "" + usingValueSignature + " " + key + " = " + usingExpressionSignature + " null;";
+					lines.add(line);
+					continue;
+				}
+				if(length == 1) {
+					String line = "" + usingValueSignature + " " + key + " = " + usingExpressionSignature + " " + innerExpression + ";";
+					lines.add(line);
+					continue;
+				}
+				for(int i = 1; i < length - 1; i++) {
+					String innerLine = "\t" + innerLines.get(i);
+					innerLines.set(i, innerLine);
+				}
+				String line = "" + usingValueSignature + " " + key + " = " + usingExpressionSignature + " " + page(innerLines) + ";";
+				lines.add(line);
+			}
+		}
+		lines.add("}");
+		return page(lines);
+	}
 	@Override
 	default int size(IterationRange iterationRange) {
 		int size = 0;
@@ -111,6 +163,10 @@ extends ExpressiveComplexValue <
 			}
 		}
 		return false;
+	}
+	@Override
+	default E_V findInnerValueWithKey(String key) {
+		return get(key);
 	}
 	default boolean put(String key, E_V value) throws CircularRegistrationException {
 		if(!ParserSystem.isLegalIdentifier(key)) {

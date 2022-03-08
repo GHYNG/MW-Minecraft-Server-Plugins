@@ -1,6 +1,8 @@
 package org.mwage.mcPlugin.main.util.methods;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.mwage.mcPlugin.main.api.MWAPIInfo_Main;
 import org.mwage.mcPlugin.main.standard.api.MWAPIInfo;
 /**
@@ -132,5 +134,25 @@ public interface StringUtil {
 			return false;
 		}
 		return goodIdentifier(identifier);
+	}
+	/**
+	 * 将给定的字符串按照行来分割。
+	 * 使用Java指定的{@code String#lines()}方法。
+	 * <p>
+	 * 推荐使用这个方法来分行，以避免不同操作系统的不同行为。
+	 * 
+	 * @param originalContent
+	 *            原字符串。
+	 * @return 分割后的字符串列表。
+	 * @see String#lines()
+	 */
+	@MWAPIInfo_Main(api = @MWAPIInfo(startsAt = 1))
+	default List<String> separateByLine(String originalContent) {
+		Stream<String> stream = originalContent.lines();
+		List<String> lines = new ArrayList<String>();
+		stream.forEach(line -> {
+			lines.add(line);
+		});
+		return lines;
 	}
 }

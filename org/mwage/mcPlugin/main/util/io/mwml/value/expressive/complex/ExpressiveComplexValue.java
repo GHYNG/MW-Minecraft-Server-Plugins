@@ -13,4 +13,5 @@ public interface ExpressiveComplexValue<V extends ExpressiveComplexValue<V, P, E
 	}
 	int size(IterationRange iterationRange);
 	boolean contains(Value<?, ?, ?, ?> value, IterationRange iterationRange, EqualsStandard iterationStandard);
+	Value<?, ?, ?, ?> findInnerValueWithKey(String key);
 }
