@@ -2,6 +2,7 @@ package org.mwage.mcPlugin.main.util.io.mwml.value.expressive.complex;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.mwage.mcPlugin.main.util.CircularRegistrationException;
 import org.mwage.mcPlugin.main.util.io.mwml.IdentifierFormatException;
 import org.mwage.mcPlugin.main.util.io.mwml.NameSpacedConcept.Signature;
@@ -11,6 +12,7 @@ import org.mwage.mcPlugin.main.util.io.mwml.parser.expressive.complex.Expressive
 import org.mwage.mcPlugin.main.util.io.mwml.value.Value;
 import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.primary.ExpressiveNullValue;
 import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.primary.ExpressivePrimaryValue;
+import org.mwage.mcPlugin.main.util.methods.LogicUtil;
 import org.mwage.mcPlugin.main.util.methods.StringUtil;
 // @formatter:off
 public interface ExpressiveTableValue <
@@ -61,7 +63,7 @@ ExpressiveComplexValue <
 	E, 
 	A
 >, 
-StringUtil
+StringUtil, LogicUtil
 // @formatter:on
 {
 	@Override
@@ -168,6 +170,36 @@ StringUtil
 	default E_V findInnerValueWithKey(String key) {
 		return get(key);
 	}
+	@Override
+	default boolean valueEquals(V another) {
+		if(another == null) {
+			return false;
+		}
+		if(or(this.getUsingValueSignature() != another.getUsingValueSignature(), this.getUsingExpressionSignature() != another.getUsingExpressionSignature())) {
+			return false;
+		}
+		if(this == another || this.equals(another)) {
+			return true;
+		}
+		Map<String, E_V> thismap = this.getExpressiveInstance(), anothermap = another.getExpressiveInstance();
+		Set<String> thiskeys = thismap.keySet(), anotherkeys = anothermap.keySet();
+		if(!thiskeys.equals(anotherkeys)) {
+			return false;
+		}
+		for(String k : thiskeys) {
+			E_V thisvalue = thismap.get(k), anothervalue = anothermap.get(k);
+			if(and(thisvalue == null, anothervalue == null)) {
+				return true;
+			}
+			if(or(thisvalue == null, anothervalue == null)) {
+				return false;
+			}
+			if(!thisvalue.valueEquals(anothervalue)) {
+				return false;
+			}
+		}
+		return true;
+	}
 	default boolean put(String key, E_V value) throws CircularRegistrationException {
 		if(!ParserSystem.isLegalIdentifier(key)) {
 			throw new IdentifierFormatException("Wrong format for identifier: " + key);
@@ -185,9 +217,34 @@ StringUtil
 				throw new CircularRegistrationException("Trying to put a outer value to become a member of its inner value.");
 			}
 		}
+		try {
+			value.appendToOuterValue(this);
+		}
+		catch(RuntimeException e) {
+			return false;
+		}
 		map.put(key, value);
-		value.appendToOuterValue(this);
 		return true;
+	}
+	default void putAll(Map<String, E_V> values) {
+		for(String key : values.keySet()) {
+			E_V value = values.get(key);
+			if(value == null) {
+				continue;
+			}
+			E_V input = value.clone();
+			try {
+				input.appendToOuterValue(this);
+			}
+			catch(RuntimeException e) {
+				continue;
+			}
+			put(key, input);
+		}
+	}
+	default void putAll(ExpressiveTableValue<V, P, E, E_V, E_P, E_VP_E, E_VP_A, A> anotherMapValue) {
+		Map<String, E_V> anotherMap = anotherMapValue.getExpressiveInstance();
+		putAll(anotherMap);
 	}
 	default E_V get(String key) {
 		if(key == null) {
