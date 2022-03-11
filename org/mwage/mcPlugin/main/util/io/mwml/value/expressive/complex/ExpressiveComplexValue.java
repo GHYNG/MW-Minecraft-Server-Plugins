@@ -8,7 +8,8 @@ public interface ExpressiveComplexValue<V extends ExpressiveComplexValue<V, P, E
 		ALL
 	}
 	enum EqualsStandard {
-		BY_VALUE,
+		BY_VALUE_EQUALS,
+		BY_OBJECT_EQUALS,
 		BY_REFERENCE
 	}
 	int size(IterationRange iterationRange);

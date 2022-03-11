@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import org.mwage.mcPlugin.main.util.CircularRegistrationException;
 import org.mwage.mcPlugin.main.util.io.mwml.IdentifierFormatException;
 import org.mwage.mcPlugin.main.util.io.mwml.NameSpacedConcept.Signature;
@@ -10,6 +11,16 @@ import org.mwage.mcPlugin.main.util.io.mwml.ParserSystem;
 import org.mwage.mcPlugin.main.util.io.mwml.parser.Parser;
 import org.mwage.mcPlugin.main.util.io.mwml.parser.expressive.complex.ExpressiveTableParser;
 import org.mwage.mcPlugin.main.util.io.mwml.value.Value;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualBooleanValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualByteValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualDoubleValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualEnumValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualFloatValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualIntValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualLongValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualNumberValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualShortValue;
+import org.mwage.mcPlugin.main.util.io.mwml.value.actual.primary.ActualStringValue;
 import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.primary.ExpressiveNullValue;
 import org.mwage.mcPlugin.main.util.io.mwml.value.expressive.primary.ExpressivePrimaryValue;
 import org.mwage.mcPlugin.main.util.methods.LogicUtil;
@@ -69,10 +80,10 @@ StringUtil, LogicUtil
 	@Override
 	default String toExpression() {
 		List<String> lines = new ArrayList<String>();
-		lines.add("list:{");
+		lines.add("table:{");
 		Map<String, E_V> map = getExpressiveInstance();
 		if(map.keySet().size() == 0) {
-			return "list:{}";
+			return "table:{}";
 		}
 		for(String key : map.keySet()) {
 			E_V innerValue = map.get(key);
@@ -147,21 +158,39 @@ StringUtil, LogicUtil
 			}
 			boolean flag = false;
 			switch(equalsStandard) {
-				case BY_VALUE :
-					flag = value.equals(innerValue);
-					break;
+				case BY_OBJECT_EQUALS :
+					if(value.equals(innerValue)) return true;
 				case BY_REFERENCE :
-					flag = value == innerValue;
+					if(value == innerValue) return true;
+				default :
 					break;
-			}
-			if(flag) {
-				return true;
 			}
 			if(iterationRange == IterationRange.ALL && innerValue instanceof ExpressiveComplexValue<?, ?, ?, ?> ecv) {
 				flag = ecv.contains(value, iterationRange, equalsStandard);
 				if(flag) {
 					return true;
 				}
+			}
+		}
+		return false;
+	}
+	default boolean contains(E_V value, EqualsStandard equalsStandard) {
+		if(value == null) {
+			return false;
+		}
+		Map<String, E_V> map = getExpressiveInstance();
+		for(String key : map.keySet()) {
+			E_V innervalue = map.get(key);
+			if(innervalue == null) {
+				return false;
+			}
+			switch(equalsStandard) {
+				case BY_VALUE_EQUALS :
+					if(value.valueEquals(innervalue)) return true;
+				case BY_OBJECT_EQUALS :
+					if(value.equals(innervalue)) return true;
+				case BY_REFERENCE :
+					if(value == innervalue) return true;
 			}
 		}
 		return false;
@@ -217,6 +246,15 @@ StringUtil, LogicUtil
 				throw new CircularRegistrationException("Trying to put a outer value to become a member of its inner value.");
 			}
 		}
+		P parser = getParser();
+		Map<String, Function<E_V, Boolean>> goodParameterJudgers = parser.getGoodParameterJudger();
+		Function<E_V, Boolean> goodParameterJudger = goodParameterJudgers.get(key);
+		if(goodParameterJudger != null) {
+			boolean good = goodParameterJudger.apply(value);
+			if(!good) {
+				return false;
+			}
+		}
 		try {
 			value.appendToOuterValue(this);
 		}
@@ -251,6 +289,145 @@ StringUtil, LogicUtil
 			throw new NullPointerException("Java method parameter: key is null.");
 		}
 		Map<String, E_V> map = getExpressiveInstance();
-		return map.get(key);
+		E_V value = map.get(key);
+		if(value == null) {
+			E_V defaultValue = getParser().getDefaultValues().get(key);
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		return value;
+	}
+	default E_V get(String key, E_V defaultValue) {
+		E_V innervalue = get(key);
+		return innervalue == null ? defaultValue == null ? null : defaultValue.clone() : null;
+	}
+	default ActualBooleanValue<?, ?, ?> getBooleanValue(String key) {
+		return getBooleanValue(key, null);
+	}
+	default ActualBooleanValue<?, ?, ?> getBooleanValue(String key, ActualBooleanValue<?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualBooleanValue<?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualByteValue<?, ?, ?> getByteValue(String key) {
+		return getByteValue(key, null);
+	}
+	default ActualByteValue<?, ?, ?> getByteValue(String key, ActualByteValue<?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualByteValue<?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualDoubleValue<?, ?, ?> getDoubleValue(String key) {
+		return getDoubleValue(key, null);
+	}
+	default ActualDoubleValue<?, ?, ?> getDoubleValue(String key, ActualDoubleValue<?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualDoubleValue<?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualEnumValue<?, ?, ?, ?> getEnumValue(String key) {
+		return getEnumValue(key, null);
+	}
+	default ActualEnumValue<?, ?, ?, ?> getEnumValue(String key, ActualEnumValue<?, ?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualEnumValue<?, ?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualFloatValue<?, ?, ?> getFloatValue(String key) {
+		return getFloatValue(key, null);
+	}
+	default ActualFloatValue<?, ?, ?> getFloatValue(String key, ActualFloatValue<?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualFloatValue<?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualIntValue<?, ?, ?> getIntValue(String key) {
+		return getIntValue(key, null);
+	}
+	default ActualIntValue<?, ?, ?> getIntValue(String key, ActualIntValue<?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualIntValue<?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualLongValue<?, ?, ?> getLongValue(String key) {
+		return getLongValue(key, null);
+	}
+	default ActualLongValue<?, ?, ?> getLongValue(String key, ActualLongValue<?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualLongValue<?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualNumberValue<?, ?, ?, ?> getNumberValue(String key) {
+		return getFloatValue(key, null);
+	}
+	default ActualNumberValue<?, ?, ?, ?> getNumberValue(String key, ActualNumberValue<?, ?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualNumberValue<?, ?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualShortValue<?, ?, ?> getShortValue(String key) {
+		return getShortValue(key, null);
+	}
+	default ActualShortValue<?, ?, ?> getShortValue(String key, ActualShortValue<?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualShortValue<?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
+	}
+	default ActualStringValue<?, ?, ?> getStringValue(String key) {
+		return getStringValue(key, null);
+	}
+	default ActualStringValue<?, ?, ?> getStringValue(String key, ActualStringValue<?, ?, ?> defaultValue) {
+		Value<?, ?, ?, ?> innervalue = get(key);
+		if(innervalue == null) {
+			return defaultValue == null ? null : defaultValue.clone();
+		}
+		if(innervalue instanceof ActualStringValue<?, ?, ?> iv) {
+			return iv;
+		}
+		return defaultValue == null ? null : defaultValue.clone();
 	}
 }

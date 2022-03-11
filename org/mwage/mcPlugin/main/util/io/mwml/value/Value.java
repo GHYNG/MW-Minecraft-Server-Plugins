@@ -74,3 +74,9 @@ public interface Value<V extends Value<V, P, E, A>, P extends Parser<P, V, E, A>
 		return getParser().copyValue(invokerModule, valueSignature, expressionSignature, (V)this);
 	}
 }
+interface Container<V extends Value<V, P, E, A>, P extends Parser<P, V, E, A>, E, A> {
+	V methodV();
+	P methodP();
+	E methodE();
+	A methodA();
+}
