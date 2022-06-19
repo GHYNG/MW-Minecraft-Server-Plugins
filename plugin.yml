@@ -1,0 +1,17 @@
+name: MW_Sign_Fix
+version: Paper-1.18.1-MW-1
+description: This plugin fixes signs not displaying texts.
+author: GHYNG
+main: org.mwage.mcPlugin.sign_fix.Main
+depend: [MW_Plugin_Main]
+
+commands:
+  fix-sign:
+    description: Fix the signs nearby.
+    usage: Type /fix-sign to fix the signs nearby.
+    permission: mw_sign_fix.fix-sign
+    
+permissions:
+  mw_sign_fix.fix-sign:
+    description: Allows user to fix signs nearby.
+    default: op
