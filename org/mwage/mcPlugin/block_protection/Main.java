@@ -58,6 +58,9 @@ class EntityListener implements Listener {
 		if(entity == null) {
 			return;
 		}
+		if(entity instanceof Player) {
+			return;
+		}
 		if(entity instanceof AbstractVillager || entity instanceof Snowman) {
 			return;
 		}
