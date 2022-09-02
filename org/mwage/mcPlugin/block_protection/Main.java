@@ -3,6 +3,7 @@ import java.util.Collection;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Animals;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -55,19 +57,27 @@ class EntityListener implements Listener {
 	@EventHandler
 	public void onEntityChangeBlock(EntityChangeBlockEvent event) {
 		Entity entity = event.getEntity();
+		Block block = event.getBlock();
+		Material material = block.getType();
 		if(entity == null) {
 			return;
 		}
 		if(entity instanceof Player) {
 			return;
 		}
-		if(entity instanceof AbstractVillager || entity instanceof Snowman) {
+		if(entity instanceof AbstractVillager) {
+			return;
+		}
+		if(entity instanceof Snowman) {
 			return;
 		}
 		if(entity instanceof FallingBlock) {
 			return;
 		}
 		if(entity instanceof Animals) {
+			return;
+		}
+		if(material == Material.CHORUS_FLOWER && entity instanceof Projectile) {
 			return;
 		}
 		event.setCancelled(true);
