@@ -13,7 +13,7 @@ public class NoteBookPlayer extends NoteBook<UUID> {
 		String author = "null", title = "null";
 		if(targetPlayer != null) {
 			author = targetPlayer.getName();
-			title = "Note about player: " + author;
+			title = "Note about player: " + author; // this might be the reason some books cannot be opened
 		}
 		this.author = author;
 		this.title = title;

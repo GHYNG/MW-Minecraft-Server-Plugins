@@ -206,7 +206,8 @@ public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listen
 		ItemStack mainHand = inventory.getItemInMainHand();
 		if(mainHand != null && mainHand.getType() == Material.WRITABLE_BOOK) {
 			int handindex = inventory.getHeldItemSlot();
-			inventory.setItem(handindex, null);
+			mainHand.setAmount(0);
+			inventory.setItem(handindex, mainHand);
 		}
 		else {
 			inventory.setItemInOffHand(null);

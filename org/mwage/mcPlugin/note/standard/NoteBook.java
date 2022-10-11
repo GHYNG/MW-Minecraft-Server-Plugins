@@ -99,10 +99,22 @@ public abstract class NoteBook<I> {
 		}
 		return strPages;
 	}
+	/**
+	 * 按照指定的页码返回一个新的笔记本实例。
+	 * 这个笔记本实例应当是一次性的，不可以进入物品栏，只是显示在屏幕上供玩家浏览。
+	 * 注意笔记本的页数是从1开始的，而不是按照习惯的0。
+	 * 
+	 * @param startPage
+	 *            开始页数。
+	 * @return 一个笔记本实例。
+	 */
 	@SuppressWarnings("deprecation")
 	public ItemStack getWrittenBookItem(int startPage) {
+		if(startPage > pages.size()) {
+			startPage = pages.size();
+		}
 		if(startPage < 1) {
-			return getWrittenBookItem(1);
+			startPage = 1;
 		}
 		int actualStartPage = startPage - 1;
 		List<String> strPages = getStringPagesTimeNewToOld();
@@ -114,7 +126,13 @@ public abstract class NoteBook<I> {
 		ItemMeta itemMeta = bookItem.getItemMeta();
 		if(itemMeta instanceof BookMeta bookMeta) {
 			bookMeta.setPages(actualStrPages);
-			bookMeta.setTitle(getTitle());
+			/*
+			 * FIXED: if the title for a book item is too long,
+			 * the item will not work correctly.
+			 * Plus the actual title for the book is not needed anyway,
+			 * since the text displayed to players will be displayName
+			 */
+			bookMeta.setTitle("book title");
 			bookMeta.setAuthor(getAuthor());
 			bookMeta.setDisplayName(getTitle());
 		}
@@ -153,7 +171,7 @@ public abstract class NoteBook<I> {
 	}
 	@SuppressWarnings("deprecation")
 	public void addNote(OfflinePlayer writer, ItemStack bookItem) {
-		if(bookItem.getItemMeta()instanceof BookMeta bookMeta) {
+		if(bookItem.getItemMeta() instanceof BookMeta bookMeta) {
 			List<String> strPages = bookMeta.getPages();
 			if(strPages.size() > 0) {
 				String p1 = strPages.get(0);

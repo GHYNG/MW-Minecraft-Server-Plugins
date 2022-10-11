@@ -124,8 +124,15 @@ public class NotePlayerProcessor extends AbstractCommandProcessor {
 								}
 								catch(Exception e) {}
 							}
+							int totalPages = noteBookPlayer.getPages().size();
+							if(startPage > totalPages) {
+								startPage = totalPages;
+							}
+							if(startPage < 1) {
+								startPage = 1;
+							}
 							senderPlayer.openBook(noteBookPlayer.getWrittenBookItem(startPage));
-							senderPlayer.sendMessage("Executed: to read note: " + noteBookPlayer.getTitle());
+							senderPlayer.sendMessage("Executed: to read note: " + noteBookPlayer.getTitle() + " pages (" + startPage + "/" + totalPages + ")");
 							playerCommandSuccessful(senderPlayer);
 							return true;
 						case WRITE :

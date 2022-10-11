@@ -1,5 +1,5 @@
 name: MW_Note
-version: Paper-1.17.1-MW-1
+version: Paper-1.17.1-MW-1.1
 description: Milkyway noting system.
 author: GHYNG
 main: org.mwage.mcPlugin.note.Main
