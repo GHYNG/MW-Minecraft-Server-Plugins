@@ -1,5 +1,5 @@
 name: MW_Note
-version: Paper-1.17.1-MW-1.1
+version: Paper-1.17.1-MW-1.2
 description: Milkyway noting system.
 author: GHYNG
 main: org.mwage.mcPlugin.note.Main
@@ -9,10 +9,18 @@ api-version: 1.16
 commands:
   note-player:
     description: Make note on a player.
-    usage: Use /note-player read <player-id> to read. Use /note-player write <player-id> to write.
+    usage: For detailed usage of this command, please see https://github.com/GHYNG/MW-Minecraft-Server-Plugins/tree/MW-Note
     permission: mw_note.note-player
+    
+  note-plugin:
+    description: Make note on a plugin.
+    usage: For detailed usage of this command, please see https://github.com/GHYNG/MW-Minecraft-Server-Plugins/tree/MW-Note
+    permission: mw_note.note-plugin
     
 permissions:
   mw_note.note-player: 
     description: Allows managers to read and write notes on players.
+    default: op
+  mw_note.note-plugin: 
+    description: Allows managers to read and write notes on plugins.
     default: op

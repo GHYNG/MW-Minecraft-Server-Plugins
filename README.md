@@ -6,33 +6,42 @@
 每一个备注对象都体现为一本笔记本。
 每一次备注会成为该笔记本的一页（因此请注意你的备注的长度）。
 
-## 对玩家的备注
+## 可以进行备注的对象
 
-使用指令```/note-player```进行玩家备注方面的操作。
-分别有```read```、```write```、```remove```、```recover```四种操作。
+目前可以对玩家和插件（功能测试中）进行备注。
+
+玩家备注指令：`/note-player`
+
+插件备注指令：`/note-plugin` （注：这个功能目前因为bug无法实现）。
+
+这些指令后面的参数的格式是相同的，可以进行若干不同的操作。
+
+## 备注操作
+
+在第一段命令（比如`/note-player`）后，使用不同的命令进行不同的操作。
 
 ### read操作
 
-使用指令```/note-player read <player-id> <optional int start-page>```查看已有的对于某玩家的备注。
+使用指令`/note-<item-type> read <item-name> <optional int start-page>`查看已有的对于该主题的一个对象（比如玩家中的某个人）的备注。
 第2参数为可选，可以直接从指定的页码开始看起。
 
 指令输入后，将直接打开一本游戏内书本，每一页显示一个备注。
 
 ### write操作
 
-使用指令```/note-player write <player-id>```获得一本代签名的书与笔。
+使用指令`/note-<item-type> write <item-name>`获得一本待签名的书与笔（物品）。
 可以在书与笔的第一页写下新的备注。
 给书签名（书的标题随意）后，新的备注就会被录入系统。
-书与笔本身会被删除。
+书与笔（物品）本身会被删除。
 
 ### remove操作
 
-使用指令```/note-player remove <player-id>```删除一条你的对某玩家的备注。
+使用指令`/note-<item-type> remove <item-name>`删除一条你的对该对象的备注。
 
 删除顺序按照从新到旧的时间顺序。
 
 ### recover操作
 
-使用指令```/note-player recover <player-id>```恢复一条你先前删除的对某玩家的备注。
+使用指令`/note-<item-type> recover <item-name>`恢复一条你先前删除的对该对象的备注。
 
-恢复顺序按照从新到旧的时间顺序。
+恢复顺序按照删除时间从新到旧的顺序。

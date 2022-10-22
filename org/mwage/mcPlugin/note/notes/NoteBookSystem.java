@@ -1,4 +1,4 @@
-package org.mwage.mcPlugin.note.standard;
+package org.mwage.mcPlugin.note.notes;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,9 +20,10 @@ import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.mwage.mcPlugin.note.Main;
-import org.mwage.mcPlugin.note.standard.NoteBook.Page;
-public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listener {
+import org.mwage.mcPlugin.note.notes.NoteBook.Page;
+public abstract class NoteBookSystem<I, NB extends NoteBook<I>> implements Listener {
 	public static class PageConfig extends HashMap<String, Object> {
 		private static final long serialVersionUID = 1L;
 		public PageConfig(NoteBook.Page page) {
@@ -39,7 +40,7 @@ public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listen
 	}
 	public final Main plugin;
 	private final Map<UUID, Set<I>> playerWritingss = new HashMap<UUID, Set<I>>();
-	private final Map<I, N> noteBooks = new HashMap<I, N>();
+	private final Map<I, NB> noteBooks = new HashMap<I, NB>();
 	public NoteBookSystem(Main plugin) {
 		this.plugin = plugin;
 		onEnable();
@@ -67,19 +68,19 @@ public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listen
 			String fileName = file.getName();
 			int fileNameLength = fileName.length();
 			String istr = fileName.substring(0, fileNameLength - getFileExtendName().length() - 1);
-			I identifier = getIdentifierFromString(istr);
+			I identifier = getIdentifierFromFileString(istr);
 			if(identifier == null) {
 				continue;
 			}
 			FileConfiguration config = new YamlConfiguration();
-			N noteBook = readyNoteBook(identifier, true);
+			NB noteBook = readyNoteBook(identifier, true);
 			try {
 				config.load(file);
 				List<?> opages = config.getList("pages");
 				for(Object opage : opages) {
 					if(opage instanceof Map<?, ?> mpage) {
 						PageConfig pageConfig = new PageConfig(mpage);
-						NoteBook.Page page = new NoteBook.Page(pageConfig);
+						NoteBook.Page page = new NoteBook.Page(noteBook, pageConfig);
 						noteBook.addPage(page);
 					}
 				}
@@ -113,11 +114,11 @@ public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listen
 		}
 		Set<I> identifiers = noteBooks.keySet();
 		for(I identifier : identifiers) {
-			File file = new File(folder, getStringFromIdentifier(identifier) + "." + getFileExtendName());
+			File file = new File(folder, getFileStringFromIdentifier(identifier) + "." + getFileExtendName());
 			try {
 				file.createNewFile();
 				FileConfiguration fileConfig = new YamlConfiguration();
-				N noteBook = readyNoteBook(identifier, true);
+				NB noteBook = readyNoteBook(identifier, true);
 				List<Page> pages = noteBook.getPages();
 				List<PageConfig> pageConfigs = new ArrayList<PageConfig>();
 				for(Page page : pages) {
@@ -146,7 +147,7 @@ public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listen
 		I identifier = playerMayWriteNote(writer, bookMeta);
 		if(identifier != null) {
 			removeNoteBookInHand(writer);
-			N noteBook = readyNoteBook(identifier, true);
+			NB noteBook = readyNoteBook(identifier, true);
 			String strPage = "" + bookMeta.getPage(1);
 			noteBook.addNote(writer, strPage);
 			playerStopWriting(writer, identifier);
@@ -172,9 +173,9 @@ public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listen
 		}
 		playerWritings.remove(identifier);
 	}
-	protected abstract N createNewNoteBook(I identifier);
-	public N readyNoteBook(I identifier, boolean forceCreate) {
-		N noteBook = noteBooks.get(identifier);
+	protected abstract NB createNewNoteBook(I identifier);
+	public NB readyNoteBook(I identifier, boolean forceCreate) {
+		NB noteBook = noteBooks.get(identifier);
 		if(noteBook == null && forceCreate) {
 			noteBook = createNewNoteBook(identifier);
 			noteBooks.put(identifier, noteBook);
@@ -191,7 +192,7 @@ public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listen
 			return null;
 		}
 		for(I identifier : playerWritings) {
-			N noteBook = noteBooks.get(identifier);
+			NB noteBook = noteBooks.get(identifier);
 			if(noteBook == null) {
 				return null;
 			}
@@ -213,8 +214,109 @@ public abstract class NoteBookSystem<I, N extends NoteBook<I>> implements Listen
 			inventory.setItemInOffHand(null);
 		}
 	}
-	protected abstract File getFolder();
-	protected abstract I getIdentifierFromString(String string);
-	protected abstract String getStringFromIdentifier(I identifier);
+	public Set<String> getCommandStrings() {
+		Set<I> keys = noteBooks.keySet();
+		Set<String> commandKeys = new HashSet<String>();
+		for(I key : keys) {
+			String commandString = getCommandStringFromIdentifier(key);
+			if(commandString != null) {
+				commandKeys.add(commandString);
+			}
+		}
+		return commandKeys;
+	}
+	public Map<I, NB> getNoteBooks() {
+		return this.noteBooks;
+	}
+	public abstract File getFolder();
 	public abstract String getFileExtendName();
+	public abstract I getIdentifierFromFileString(String string);
+	public abstract String getFileStringFromIdentifier(I identifier);
+	public abstract I getIdentifierFromCommandString(String string);
+	public abstract String getCommandStringFromIdentifier(I identifier);
+	public abstract String getItemTypeName();
+	public Set<I> getExistingNoteTargets() {
+		return noteBooks.keySet();
+	}
+	public abstract Set<I> getPossibleNoteTargets();
+	public List<String> getExistingNoteTargetCommandStrings() {
+		List<String> commandStrings = new ArrayList<String>();
+		for(I identifier : noteBooks.keySet()) {
+			String commandString = getCommandStringFromIdentifier(identifier);
+			if(commandString != null) {
+				commandStrings.add(commandString);
+			}
+		}
+		return commandStrings;
+	}
+	public List<String> getPossibleNoteTargetCommandStrings() {
+		List<String> commandStrings = new ArrayList<String>();
+		for(I identifier : getPossibleNoteTargets()) {
+			String commandString = getCommandStringFromIdentifier(identifier);
+			if(commandString != null) {
+				commandStrings.add(commandString);
+			}
+		}
+		return commandStrings;
+	}
+	public boolean canRemoveNoteOf(OfflinePlayer author) {
+		for(I identifier : noteBooks.keySet()) {
+			NB noteBook = noteBooks.get(identifier);
+			if(noteBook != null && noteBook.canRemoveNoteOf(author)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean canRecoverNoteOf(OfflinePlayer author) {
+		for(I identifier : noteBooks.keySet()) {
+			NB noteBook = noteBooks.get(identifier);
+			if(noteBook != null && noteBook.canRecoverNoteOf(author)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	@SuppressWarnings("deprecation")
+	public static ItemStack getWrittenBookItem(List<NoteBook.Page> pages, String author, String title, int startPage) {
+		if(startPage > pages.size()) {
+			startPage = pages.size();
+		}
+		if(startPage < 1) {
+			startPage = 1;
+		}
+		int actualStartPage = startPage - 1;
+		List<String> strPages = NoteBook.Page.getStringPagesTimeNewToOld(pages);
+		List<String> actualStrPages = new ArrayList<String>();
+		for(int i = actualStartPage; i < strPages.size(); i++) {
+			actualStrPages.add(strPages.get(i));
+		}
+		ItemStack bookItem = new ItemStack(Material.WRITTEN_BOOK);
+		ItemMeta itemMeta = bookItem.getItemMeta();
+		if(itemMeta instanceof BookMeta bookMeta) {
+			bookMeta.setPages(actualStrPages);
+			/*
+			 * FIXED: if the title for a book item is too long,
+			 * the item will not work correctly.
+			 * Plus the actual title for the book is not needed anyway,
+			 * since the text displayed to players will be displayName
+			 */
+			bookMeta.setTitle("book title");
+			bookMeta.setAuthor(author);
+			bookMeta.setDisplayName(title);
+		}
+		bookItem.setItemMeta(itemMeta);
+		return bookItem;
+	}
+	public ItemStack getWrittenBookItem(int startPage) {
+		List<NoteBook.Page> pages = new ArrayList<NoteBook.Page>();
+		for(I identifier : noteBooks.keySet()) {
+			NB noteBook = noteBooks.get(identifier);
+			if(noteBook == null) {
+				continue;
+			}
+			pages.addAll(noteBook.getPages());
+		}
+		return getWrittenBookItem(pages, "Server", "Note Books", startPage);
+	}
 }
