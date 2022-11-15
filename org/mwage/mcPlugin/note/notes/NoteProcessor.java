@@ -367,6 +367,7 @@ class OPCNote<I, NB extends NoteBook<I>, NS extends NoteBookSystem<I, NB>> exten
 			}
 			@Override
 			public boolean localPreRun(CommandSender sender, String command) {
+				targetItem = noteBookSystem.getIdentifierFromCommandString(command);
 				return targetItem != null;
 			}
 			@Override
