@@ -293,13 +293,15 @@ class OPCNote<I, NB extends NoteBook<I>, NS extends NoteBookSystem<I, NB>> exten
 		}
 	}
 	class OPCWrite extends OrderedParameterCommand {
-		private I targetItem;
+		// private I targetItem;
+		private String targetItemName;
 		private final OPCNotedItem branchNotedItem;
 		private final OPCNewItem branchNewItem;
 		public OPCWrite(OrderedParameterCommand parent) {
 			super(parent, "write");
 			branchNotedItem = new OPCNotedItem(this);
 			branchNewItem = new OPCNewItem(this);
+			activateSubCommand(branchNewItem);
 		}
 		@Override
 		public boolean isCommandLegal(CommandSender sender, String command) {
@@ -325,8 +327,13 @@ class OPCNote<I, NB extends NoteBook<I>, NS extends NoteBookSystem<I, NB>> exten
 					senderPlayer.sendMessage("Exception: You must have an empty main hand to write a new note!");
 					return true;
 				}
+				if(targetItemName == null) {
+					senderPlayer.sendMessage("Error: Target item name not detected in command line."); // this should not happen
+					return true;
+				}
+				I targetItem = noteBookSystem.getIdentifierFromCommandString(targetItemName);
 				if(targetItem == null) {
-					senderPlayer.sendMessage("Error: Target item not found.");
+					senderPlayer.sendMessage("Error: Target item: " + targetItemName + " not found.");
 					return true;
 				}
 				NB noteBook = noteBookSystem.readyNoteBook(targetItem, true);
@@ -343,18 +350,12 @@ class OPCNote<I, NB extends NoteBook<I>, NS extends NoteBookSystem<I, NB>> exten
 		}
 		@Override
 		public void localUpdate(CommandSender sender, String command) {
-			targetItem = null;
+			targetItemName = null;
 			if(noteBookSystem.getNoteBooks().size() == 0) {
 				deactivateSubCommand(branchNotedItem);
 			}
 			else {
 				activateSubCommand(branchNotedItem);
-			}
-			if(branchNewItem.getLocalTabComplete(sender, null).size() == 0) {
-				deactivateSubCommand(branchNewItem);
-			}
-			else {
-				activateSubCommand(branchNewItem);
 			}
 		}
 		abstract class OPCItem extends OrderedParameterCommand {
@@ -367,8 +368,8 @@ class OPCNote<I, NB extends NoteBook<I>, NS extends NoteBookSystem<I, NB>> exten
 			}
 			@Override
 			public boolean localPreRun(CommandSender sender, String command) {
-				targetItem = noteBookSystem.getIdentifierFromCommandString(command);
-				return targetItem != null;
+				targetItemName = command;
+				return targetItemName != null;
 			}
 			@Override
 			public boolean localPostRun(CommandSender sender, String command) {
@@ -376,7 +377,7 @@ class OPCNote<I, NB extends NoteBook<I>, NS extends NoteBookSystem<I, NB>> exten
 			}
 			@Override
 			public void localUpdate(CommandSender sender, String command) {
-				targetItem = noteBookSystem.getIdentifierFromCommandString(command);
+				targetItemName = command;
 			}
 		}
 		class OPCNotedItem extends OPCItem {
@@ -418,7 +419,8 @@ class OPCNote<I, NB extends NoteBook<I>, NS extends NoteBookSystem<I, NB>> exten
 			}
 			@Override
 			public boolean isCommandLegal(CommandSender sender, String command) {
-				return getLocalTabComplete(sender, command).contains(command);
+				// return getLocalTabComplete(sender, command).contains(command);
+				return true; // this allows all possible notes
 			}
 			@Override
 			public String getLocalLocalEchoHelp(CommandSender sender, String command) {
